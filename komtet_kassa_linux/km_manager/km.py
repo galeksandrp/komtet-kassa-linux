@@ -160,19 +160,34 @@ class KM(BaseKM):
             )
             position_discount = to_decimal(discount / position['quantity'] if discount else 0)
 
+            quantity = position['quantity']
             price = float(decimal.Decimal(position['price']) - position_discount)
             total = float(decimal.Decimal(position['total']))
 
-            receipt.add_position(
-                position['name'], price, position['quantity'],
-                position['total'], position['vat']['number'],
-                discount=discount,
+            # Выявление позиций с погрешностью в тотал
+            has_extra_position = (total != price * quantity) and quantity > 1
+
+            if has_extra_position:
+                quantity -= 1
+
+            position_info = dict(
+                name=position['name'],
+                vat=position['vat']['number'],
                 measurement_unit=position.get('measure_name'),
                 payment_method=position.get('calculation_method'),
                 payment_object=position.get('calculation_subject'),
                 agent=agent, supplier=supplier,
                 nomenclature_code=position.get('nomenclature_code')
             )
+
+            base_position_total = float(to_decimal(price * quantity))
+
+            receipt.add_position(price=price, quantity=quantity, total=base_position_total,
+                                 discount=discount, **position_info)
+
+            if has_extra_position:
+                price = total - base_position_total
+                receipt.add_position(price=price, quantity=1, total=price, **position_info)
 
         for payment in task['payments']:
             receipt.add_payment(payment['sum'], payment['type'])
