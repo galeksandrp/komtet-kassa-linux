@@ -1,12 +1,25 @@
 import logging
 
 from komtet_kassa_linux.driver import IFptr
-
+from komtet_kassa_linux.libs.memoize import memoize_property
 
 logger = logging.getLogger(__name__)
 
 
 TYPES = STRING, DOUBLE, INTEGER, BOOL, DATETIME = 'string', 'double', 'integer', 'bool', 'datetime'
+MODE_SIGNS = (AUTO_MODE_SIGN, OFFLINE_MODE_SIGN, ENCRYPTION_SIGN, INTERNET_SIGN, SERVICE_SIGN,
+              BSO_SIGN, LOTTERY_SIGN, GAMBLING_SIGN, EXCISE_SIGN, MACHINE_INSTALLATION_SIGN) = [
+    1001,  # 'Признак автоматического режима',
+    1002,  # 'Признак автономного режима',
+    1056,  # 'Признак шифрования',
+    1108,  # 'Признак ККТ для расчетов в сети Интернет',
+    1109,  # 'Признак расчетов за услуги',
+    1110,  # 'Признак АС БСО',
+    1126,  # 'Признак проведения лотерей',
+    1193,  # 'Признак проведения азартных игр',
+    1207,  # 'Признак подакцизного товара',
+    1221  # 'Признак установки в автомате'
+]
 
 
 def _get_param(fptr, tag, _type=STRING):
@@ -50,6 +63,10 @@ class KKT:
     @property
     def inn(self):
         return self._get_reg_info(1018)
+
+    @memoize_property
+    def mode_signs(self):
+        return {code: self._get_reg_info(code, BOOL) for code in MODE_SIGNS}
 
     @property
     def reg_number(self):

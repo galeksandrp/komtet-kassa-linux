@@ -5,7 +5,7 @@ import os
 import shelve
 
 from komtet_kassa_linux.devices import DeviceManager, Receipt, Shift
-from komtet_kassa_linux.devices.kkt import KKT
+from komtet_kassa_linux.devices.kkt import KKT, INTERNET_SIGN
 from komtet_kassa_linux.devices.receipt import Agent, Supplier
 from komtet_kassa_linux.driver import ERROR_DENIED_IN_CLOSED_RECEIPT, Driver, DriverException
 from komtet_kassa_linux.libs.komtet_kassa import POS
@@ -214,6 +214,12 @@ class KM(BaseKM):
             logger.warning("Некорректный ИНН чека: %s. ИНН ККМ: %s",
                            task.get('inn'), self._kkt.inn)
             report['error_description'] = 'ИНН чека и ККМ не совпадают'
+            return report
+
+        is_only_internet_sign = self._kkt.mode_signs[INTERNET_SIGN] and sum(self._kkt.mode_signs.values()) == 1
+        if is_only_internet_sign and not task.get('user'):
+            logger.warning("В режиме Интернет необходимы email/телефон клиента")
+            report['error_description'] = 'Отсутствует email/телефон клиента для режима Интернет'
             return report
 
         shift = Shift(self._driver, self._device['ID_SERIAL_SHORT'])
