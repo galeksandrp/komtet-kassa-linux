@@ -196,13 +196,15 @@ class Receipt:
         self._set_param(1227, name)
 
     def add_position(self, name, price, quantity, total, vat, measurement_unit=None,
-                     payment_method=None, payment_object=None, agent=None, supplier=None):
+                     payment_method=None, payment_object=None, agent=None, supplier=None,
+                     discount=0.0):
         params = {
             IFptr.LIBFPTR_PARAM_COMMODITY_NAME: name,
             IFptr.LIBFPTR_PARAM_PRICE: price,
             IFptr.LIBFPTR_PARAM_QUANTITY: quantity,
             IFptr.LIBFPTR_PARAM_POSITION_SUM: total,
             IFptr.LIBFPTR_PARAM_TAX_TYPE: TAX_MAP[vat],
+            IFptr.LIBFPTR_PARAM_INFO_DISCOUNT_SUM: discount
         }
         if measurement_unit:
             params[1197] = measurement_unit
