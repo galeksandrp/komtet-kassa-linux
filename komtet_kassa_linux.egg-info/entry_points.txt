@@ -1,0 +1,3 @@
+[console_scripts]
+kklinux = komtet_kassa_linux:run
+

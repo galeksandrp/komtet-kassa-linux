@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Фискальные регистраторы{% endblock %}
+{% block body %}
+
+  <h2>
+    Фискальные регистраторы
+    <a href="{{ url_for('registrate_printer') }}">Добавить ФР</a>
+  </h2>
+
+
+  <div class="row justify-content-center">
+    <table class="col-8">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Название</th>
+          <th>Статус</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for printer in printers %}
+          <tr>
+            <td>
+              <a href="{{ url_for('printer_details', printer_number=printer.serial_number) }}">
+                {{ printer.is_virtual and 'Виртуальный принтер' or printer.serial_number }}
+              </a>
+            </td>
+            <td>{{ printer.name }}</td>
+            <td>
+              <ul class="state">
+                {% if printer.is_virtual or printer.serial_number in connected_devices %}
+                  <li class="online"><span>подкл.</span></li>
+                {% else %}
+                  <li class="offline"><span>откл.</span></li>
+                {% endif %}
+              </ul>
+            </td>
+            <td class="actions">
+              <a href="{{ url_for('deactivate_printer', printer_number=printer.serial_number) }}">
+                <i class="fa fa-trash-o fa-lg"></i>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

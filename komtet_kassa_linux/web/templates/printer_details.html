@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Детальная информация{% endblock %}
+{% block body %}
+  <h2>
+    Детальная информация по "{{ printer.name }}"
+  </h2>
+  <div class="row justify-content-center">
+    <table class="col-8">
+      <tbody>
+        <tr>
+          <td><strong>Cерийный номер</strong></td>
+          <td>{{ info.serial_number }}</td>
+        </tr>
+        <tr>
+          <td><strong>Номер ФН</strong></td>
+          <td>{{ info.fiscal_id }}</td>
+        </tr>
+        <tr>
+          <td><strong>Окончание срока действия ФН</strong></td>
+          <td>{{ info.validity.strftime('%d-%m-%Y %H:%I') }}</td>
+        </tr>
+        <tr>
+          <td><strong>Ошибки и предупреждения ККТ</strong></td>
+          <td>
+            {% if info.errors %}
+              <ul>
+                {% for error in info.errors %}
+                  <li class="text-danger">{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="text-success">Ошибок нет</div>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Кол-во неподтвержденных ФД</strong></td>
+          <td>{{ info.unconfirmed_document_count }}</td>
+        </tr>
+        <tr>
+          <td><strong>Номер последнего ФД</strong></td>
+          <td>{{ info.last_document }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация принтера{% endblock %}
+{% block body %}
+
+  <h2>Регистрация принтера</h2>
+
+  {% if error %}
+    <div class="alert alert-danger" role="alert">
+      <strong>Ошибка!</strong> {{error}}
+    </div>
+  {% endif %}
+  <div class="row justify-content-center">
+    <form method="POST" class="col-4">
+      <label class="form-group has-float-label">
+        <input id="name" class="form-control" name="name" type="text" required placeholder="КМ1" value="{{request.form.get('name', '')}}">
+        <span for="name" class="label">Название</span>
+      </label>
+
+      <label class="form-group has-float-label">
+        <input id="posKey" class="form-control" name="pos_key" type="text" required placeholder="PoS_kEY" value="{{request.form.get('pos_key', '')}}">
+        <span for="posKey" class="label">ID кассы</span>
+      </label>
+
+      <label class="form-group has-float-label">
+        <input id="shopSecret" class="form-control" name="pos_secret" type="text" required placeholder="pOS_sEcREt" value="{{request.form.get('pos_secret', '')}}">
+        <span for="shopSecret" class="label">Секретный ключ кассы</span>
+      </label>
+
+      <label class="form-group has-float-label">
+        <select id="device" class="form-control" name="serial_number" type="text" placeholder="123" required>
+          <option value="{{ vprinter_sn }}">Виртуальный принтер</option>
+          {% for serial_number in printers %}
+            <option value="{{ serial_number }}"
+              {% if serial_number == request.form.get('serial_number') %}
+                    selected
+              {% endif %}
+              >{{ serial_number }}</option>
+          {% endfor %}
+        </select>
+        <span for="device" class="label">Принтер</span>
+      </label>
+
+      <button type="submit" class="form-control btn">Активировать</button>
+      <a href="{{ url_for('devices') }}" class="form-control btn">Отмена</a>
+    </form>
+  </div>
+
+{% endblock %}
