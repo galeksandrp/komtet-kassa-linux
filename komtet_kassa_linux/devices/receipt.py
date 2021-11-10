@@ -81,7 +81,13 @@ PAYMENT_OBJECT_MAP = {
     'payment': 10,
     'commission': 11,
     'composite': 12,
-    'other': 13
+    'pay': 12,
+    'other': 13,
+    'property_right': 14,
+    'non_operating': 15,
+    'insurance': 16,
+    'sales_tax': 17,
+    'resort_fee': 18,
 }
 
 

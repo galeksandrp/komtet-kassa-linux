@@ -4,6 +4,7 @@ import time
 
 import requests
 from flask import flash, redirect, render_template, request, url_for
+from requests.exceptions import HTTPError
 
 import komtet_kassa_linux
 from komtet_kassa_linux import settings
@@ -40,17 +41,18 @@ def registrate_printer():
 
     if request.method == 'POST':
         pos = POS(request.form['pos_key'], request.form['pos_secret'])
-        resp = pos.activate(request.form['serial_number'], settings.LEASE_STATION)
-        if resp['success']:
+        try:
+            pos.activate(request.form['serial_number'], settings.LEASE_STATION)
+        except HTTPError as exc:
+            error = exc.response.json()['description']
+            logger.warning('Activation error: %s', error)
+        else:
             device = device_manager.get(request.form['serial_number'])
             printer = Printer(devname=device and device['DEVPATH'],
                               **request.form.to_dict()).save()
             logger.info('Add %s', printer)
             change_event.set()
             return redirect(url_for('devices'))
-
-        error = resp.json()['description']
-        logger.warging('Activation error: %s', error)
 
     actived_devices = Printer.query.all()
     devices = filter(lambda serial_number: serial_number not in actived_devices,
