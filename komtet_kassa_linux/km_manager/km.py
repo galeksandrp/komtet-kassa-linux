@@ -164,13 +164,14 @@ class KM(BaseKM):
             total = float(decimal.Decimal(position['total']))
 
             receipt.add_position(
-                position['name'], price, position['quantity'], 
+                position['name'], price, position['quantity'],
                 position['total'], position['vat']['number'],
                 discount=discount,
                 measurement_unit=position.get('measure_name'),
                 payment_method=position.get('calculation_method'),
                 payment_object=position.get('calculation_subject'),
-                agent=agent, supplier=supplier
+                agent=agent, supplier=supplier,
+                nomenclature_code=position.get('nomenclature_code')
             )
 
         for payment in task['payments']:

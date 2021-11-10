@@ -197,7 +197,7 @@ class Receipt:
 
     def add_position(self, name, price, quantity, total, vat, measurement_unit=None,
                      payment_method=None, payment_object=None, agent=None, supplier=None,
-                     discount=0.0):
+                     discount=0.0, nomenclature_code=None):
         params = {
             IFptr.LIBFPTR_PARAM_COMMODITY_NAME: name,
             IFptr.LIBFPTR_PARAM_PRICE: price,
@@ -212,6 +212,8 @@ class Receipt:
             params[1214] = PAYMENT_METHOD_MAP[payment_method]
         if payment_object:
             params[1212] = PAYMENT_OBJECT_MAP[payment_object]
+        if nomenclature_code and nomenclature_code.get('hex_code'):
+            params[1162] = bytearray.fromhex(nomenclature_code['hex_code'])
 
         if agent:
             params.update(dict(agent))
