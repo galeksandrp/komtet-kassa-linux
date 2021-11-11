@@ -1,0 +1,23 @@
+FROM python:3-alpine AS python-setup
+
+WORKDIR /usr/src/app
+
+RUN pip install --no-cache-dir wheel
+RUN pip install --no-cache-dir --upgrade pip setuptools
+
+COPY . .
+
+FROM python-setup AS python-build
+
+RUN apk add --no-cache build-base linux-headers
+RUN pip wheel -w /root/wheels . || true
+
+FROM python-setup
+
+COPY --from=python-build /usr/src/app /usr/src/app
+COPY --from=python-build /root/wheels /root/wheels
+RUN pip install --no-cache-dir --find-links /root/wheels . && rm -rf /root/wheels
+RUN apk add --no-cache udev
+
+ENV DEBUG=true
+CMD ["kklinux"]
