@@ -1,7 +1,11 @@
 import logging
 from threading import Lock
 
-from pyudev import Context, Monitor, MonitorObserver
+if True: # utilsGetWinAvailability
+    import os
+    import json
+else:
+    from pyudev import Context, Monitor, MonitorObserver
 
 from komtet_kassa_linux.driver import Driver
 from komtet_kassa_linux.models import change_event
@@ -43,18 +47,24 @@ class DeviceManager(metaclass=SingletonMeta):
     def __init__(self):
         self._lock = Lock()
 
-        context = Context()
-        for device in context.list_devices(subsystem=SUBSYSTEM, ID_BUS=SUBSYSTEM,
-                                           ID_VENDOR_ID=ATOL_VENDOR_ID):
-            self._add(dict(device.properties))
+        if True: # utilsGetWinAvailability
+            with open(os.path.join(os.getcwd(), 'komtet_kassa_linux_devices.json')) as utilsKKLDevices:
+                for utilsKKLDevice in json.load(utilsKKLDevices):
+                    self._add(utilsKKLDevice)
+        else:
+            context = Context()
+            for device in context.list_devices(subsystem=SUBSYSTEM, ID_BUS=SUBSYSTEM,
+                                            ID_VENDOR_ID=ATOL_VENDOR_ID):
+                self._add(dict(device.properties))
 
-        monitor = Monitor.from_netlink(context)
-        monitor.filter_by(subsystem=SUBSYSTEM)
-        self.observer = observer = MonitorObserver(monitor, self.__observer_handler)
-        observer.start()
+            monitor = Monitor.from_netlink(context)
+            monitor.filter_by(subsystem=SUBSYSTEM)
+            self.observer = observer = MonitorObserver(monitor, self.__observer_handler)
+            observer.start()
 
     def __del__(self):
-        self.observer.stop()
+        if False: # utilsGetWinAvailability
+            self.observer.stop()
 
     def __observer_handler(self, action, device):
         if action == 'add':
