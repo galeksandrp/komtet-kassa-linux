@@ -126,8 +126,17 @@ class KM(BaseKM):
 
     def create_receipt(self, task):
         receipt = Receipt(self._driver, task['intent'])
-        if task['cashier'] and task['cashier_inn']:
-            receipt.set_cashier(task['cashier'], task['cashier_inn'])
+        if True: # utilsGetChequeVATIDLessOperatorNameAvailability
+            utilsOperator = ''
+            utilsOperatorVATID = ''
+            if task['cashier']:
+                utilsOperator = task['cashier']
+            if task['cashier_inn']:
+                utilsOperatorVATID = task['cashier_inn']
+            receipt.set_cashier(utilsOperator, utilsOperatorVATID)
+        else:
+            if task['cashier'] and task['cashier_inn']:
+                receipt.set_cashier(task['cashier'], task['cashier_inn'])
         if task.get('client'):
             receipt.set_client(task['client'].get('inn'), task['client'].get('name'))
         receipt.sno = task['sno']
