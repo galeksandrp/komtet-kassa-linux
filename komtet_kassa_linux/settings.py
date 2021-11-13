@@ -10,7 +10,10 @@ LEASE_STATION = None
 DB_FILE = 'komtet_kassa_linux.db'
 
 KOMTET_KASSA_API = 'https://kassa.komtet.ru/api/pos/v1'
-LATEST_VERSION_URL = 'https://dist-kassa.komtet.ru/products/KOMTETKassaLinux4/latest.json'
+if True: # utilsGetForkUpdateURLAvailability
+    LATEST_VERSION_URL = 'https://raw.githubusercontent.com/galeksandrp/komtet-kassa-linux/win/latest.json'
+else:
+    LATEST_VERSION_URL = 'https://dist-kassa.komtet.ru/products/KOMTETKassaLinux4/latest.json'
 
 SECRET_KEY = 'IjI2MjViNDkwYmFkNjAxZmY0NTVjZWQ5MmRlNGY5Yjk3ODgw'
 
