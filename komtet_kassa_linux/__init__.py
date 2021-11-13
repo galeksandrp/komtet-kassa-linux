@@ -6,6 +6,9 @@ from komtet_kassa_linux.km_manager import run as run_manager
 from komtet_kassa_linux.web import run as run_web
 
 
+if True: # utilsGetLoggingAvailability
+    logging.basicConfig(level=logging.DEBUG)
+
 logger = logging.getLogger(__name__)
 
 
