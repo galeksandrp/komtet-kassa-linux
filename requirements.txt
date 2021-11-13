@@ -9,6 +9,7 @@ Jinja2==3.0.1
 Mako==1.1.4
 MarkupSafe==2.1.1
 psutil==5.9.0
+python-certifi-win32==1.6
 python-dateutil==2.8.1
 python-editor==1.0.4
 pytest-mock==3.7.0
