@@ -53,7 +53,7 @@ class RepeatThread(threading.Thread):
 class KmManager:
     _km_threads = {}
 
-    def __init__(self, db_path, interval=10, rent_station=None):
+    def __init__(self, db_path, interval=90, rent_station=None):
         self._interval = interval
         self._rent_station = rent_station
         self._device_manager = DeviceManager()
