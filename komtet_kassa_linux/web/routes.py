@@ -123,7 +123,10 @@ def upgrade():
         latest_info['url'] = utilsLatestInfoURL
     logger.info('Finish update to %s', latest_info['version'])
 
-    return redirect(url_for('raspberry_km.logout'))
+    if True: # utilsGetUpgradeLogoutFix
+        return redirect(url_for('logout'))
+    else:
+        return redirect(url_for('raspberry_km.logout'))
 
 
 @app.route('/devices/<string:printer_number>')
