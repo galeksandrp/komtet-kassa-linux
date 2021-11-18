@@ -50,6 +50,9 @@ class Shift:
             return fptr.getParamInt(IFptr.LIBFPTR_PARAM_SHIFT_NUMBER)
 
     def open(self, cashier_name=None, cashier_inn=None):
+        if True: # getShiftOpenlessAvailability
+            logger.info('%s открытие запрещено, команда проигнорирована', self)
+            return
         if self.is_open:
             return
         elif self.is_expired:
@@ -75,6 +78,9 @@ class Shift:
         return True
 
     def close(self):
+        if True: # getShiftCloselessAvailability
+            logger.info('%s закрытие запрещено, команда проигнорирована', self)
+            return
         if self.is_closed:
             return
 
