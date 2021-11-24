@@ -131,7 +131,7 @@ class KM(BaseKM):
             utilsOperatorVATID = ''
             if task['cashier']:
                 utilsOperator = task['cashier']
-            if task['cashier_inn']:
+            if task['cashier_inn'] and task['cashier_inn'] != '000000000184':
                 utilsOperatorVATID = task['cashier_inn']
             receipt.set_cashier(utilsOperator, utilsOperatorVATID)
         else:
