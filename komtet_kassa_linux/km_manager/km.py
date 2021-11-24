@@ -198,7 +198,13 @@ class KM(BaseKM):
                 return report
 
         try:
-            receipt.fiscalize(task.get('print'))
+            if True: # getATOLCallbackURLPhysicalChequeAvailability
+                if task.get('atol_callback_url'):
+                    receipt.fiscalize(True)
+                else:
+                    receipt.fiscalize(task.get('print'))
+            else:
+                receipt.fiscalize(task.get('print'))
         except DriverException as exc:
             logger.info(f'Ошибка фискализации чека: {repr(exc)}')
             try:
