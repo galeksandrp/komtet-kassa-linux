@@ -26,17 +26,25 @@ class Store:
 
     def __init__(self, kkt_name):
         self._file_path = STORE_DIR + kkt_name
+        if True: # getStoreDictAvailability
+            self.utilsDictionary = dict()
 
     def _open_shelve(self):
         return shelve.open(self._file_path)
 
     def get(self):
-        with self._open_shelve() as s:
-            return s.get('receipt')
+        if True: # getStoreDictAvailability
+            return self.utilsDictionary.get('receipt')
+        else:
+            with self._open_shelve() as s:
+                return s.get('receipt')
 
     def save(self, value):
-        with self._open_shelve() as s:
-            s['receipt'] = value
+        if True: # getStoreDictAvailability
+            self.utilsDictionary['receipt'] = value
+        else:
+            with self._open_shelve() as s:
+                s['receipt'] = value
 
 
 class BaseKM:
