@@ -54,10 +54,6 @@ class BaseKM:
         raise NotImplementedError
 
     def beat(self, is_only_send_report=False):
-        if True: # utilsGetOpenCloseDeviceOnBeatAvailability
-            self._driver = Driver(self._device)
-            self._kkt = KKT(self._driver)
-
         if not self.printer.is_virtual:
             # TODO: вынести в AtolKM
             Shift(self._driver, self.printer.serial_number).autocheck()
@@ -85,8 +81,6 @@ class BaseKM:
             return bool(receipt)
         finally:
             self.store.save(receipt)
-            if True: # utilsGetOpenCloseDeviceOnBeatAvailability
-                self._driver.destroy()
 
 
 class KM(BaseKM):
@@ -98,9 +92,8 @@ class KM(BaseKM):
     def __init__(self, printer, rent_station=None):
         super().__init__(printer, rent_station)
         self._device = device = DeviceManager().get(printer.serial_number)
-        if False: # utilsGetOpenCloseDeviceOnBeatAvailability
-            self._driver = driver = Driver(device)
-            self._kkt = KKT(driver)
+        self._driver = driver = Driver(device)
+        self._kkt = KKT(driver)
 
     def __del__(self):
         self._driver.destroy()
