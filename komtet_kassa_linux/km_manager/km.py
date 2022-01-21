@@ -85,17 +85,31 @@ class KM(BaseKM):
     _device = None
     _driver = None
     _kkt = None
+    utilsDeviceInfo = None
 
     def __init__(self, printer, rent_station=None):
         super().__init__(printer, rent_station)
         self._device = device = DeviceManager().get(printer.serial_number)
-        self._driver = driver = Driver(device)
-        self._kkt = KKT(driver)
+        if False: # utilsGetOpenCloseDeviceOnReceiptAvailability
+            self._driver = driver = Driver(device)
+            self._kkt = KKT(driver)
 
     def __del__(self):
         self._driver.destroy()
 
     def get_device_info(self):
+        if self.utilsDeviceInfo is None:
+            self._driver = Driver(self._device)
+            try:
+                self._kkt = KKT(self._driver)
+                self.utilsDeviceInfo = self.get_device_info_real()
+            finally:
+                self._driver.destroy()
+
+        self.utilsDeviceInfo.update({'rent_station': self.rent_station})
+        return self.utilsDeviceInfo
+
+    def get_device_info_real(self):
         try:
             info = self._kkt.get_info()
             self.printer.is_online = True
@@ -112,6 +126,15 @@ class KM(BaseKM):
         return info
 
     def fiscalize_receipt(self, task):
+        self._driver = Driver(self._device)
+        try:
+            self._kkt = KKT(self._driver)
+            report = self.fiscalize_receipt_real(task)
+        finally:
+            self._driver.destroy()
+        return report
+
+    def fiscalize_receipt_real(self, task):
         report = dict(
             id=task['id'],
             inn=self._kkt.inn,
