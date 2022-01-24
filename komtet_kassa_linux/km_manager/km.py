@@ -157,7 +157,7 @@ class KM(BaseKM):
                 datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
                 task['correction']['document']
             )
-        else:
+        if True: # getCorrectionChequePaymentAddressAvailability
             receipt.payment_address = task.get('payment_address')
 
         for position in task['positions']:
