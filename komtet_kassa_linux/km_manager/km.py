@@ -133,15 +133,12 @@ class KM(BaseKM):
         return info
 
     def create_receipt(self, task):
-        if task['intent'] == 'sell' and '_' in task['cashier']: # getSellAsCorrectionAvailability
-            receipt = Receipt(self._driver, 'sellCorrection')
-        else:
-            receipt = Receipt(self._driver, task['intent'])
+        receipt = Receipt(self._driver, task['intent'])
         if True: # utilsGetChequeVATIDLessOperatorNameAvailability
             utilsOperator = ''
             utilsOperatorVATID = ''
             if task['cashier']:
-                utilsOperator = task['cashier'].split('_')[0]
+                utilsOperator = task['cashier']
             if task['cashier_inn'] and task['cashier_inn'] != '000000000184':
                 utilsOperatorVATID = task['cashier_inn']
             receipt.set_cashier(utilsOperator, utilsOperatorVATID)
@@ -159,13 +156,6 @@ class KM(BaseKM):
                 task['correction']['description'],
                 datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
                 task['correction']['document']
-            )
-        elif task['intent'] == 'sell' and '_' in task['cashier']: # getSellReturnAsCorrectionAvailability
-            receipt.set_correction_info(
-                'self', # task['correction']['type'],
-                '', # task['correction']['description'],
-                datetime.datetime.strptime(task['cashier'].split('_')[1], "%Y-%m-%d"), # datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
-                'самостоятельно' # task['correction']['document']
             )
         if True: # getCorrectionChequePaymentAddressAvailability
             receipt.payment_address = task.get('payment_address')
