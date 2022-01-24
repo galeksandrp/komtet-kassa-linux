@@ -132,13 +132,26 @@ class KM(BaseKM):
         info.update({'rent_station': self.rent_station})
         return info
 
+    def utilsTaskToReceipt(self, task, utilsCashierParts):
+        if '_' in task['cashier']:
+            if task['intent'] == utilsCashierParts[1]:
+                if task['intent'] == 'sell':
+                    return Receipt(self._driver, 'sellCorrection')
+                elif task['intent'] == 'sellReturn':
+                    return Receipt(self._driver, 'sellReturnCorrection')
+        return Receipt(self._driver, task['intent'])
+
     def create_receipt(self, task):
-        receipt = Receipt(self._driver, task['intent'])
+        if True: # getSellAndSellReturnAsCorrectionAvailability
+            utilsCashierParts = task['cashier'].split('_')
+            receipt = self.utilsTaskToReceipt(task, utilsCashierParts)
+        else:
+            receipt = Receipt(self._driver, task['intent'])
         if True: # utilsGetChequeVATIDLessOperatorNameAvailability
             utilsOperator = ''
             utilsOperatorVATID = ''
             if task['cashier']:
-                utilsOperator = task['cashier']
+                utilsOperator = utilsCashierParts[0]
             if task['cashier_inn'] and task['cashier_inn'] != '000000000184':
                 utilsOperatorVATID = task['cashier_inn']
             receipt.set_cashier(utilsOperator, utilsOperatorVATID)
@@ -150,6 +163,9 @@ class KM(BaseKM):
         receipt.sno = task['sno']
         receipt.email = task.get('user')
 
+        if True: # getSellAndSellReturnAsCorrectionAvailability
+            if '_' in task['cashier'] and task['intent'] == utilsCashierParts[1]:
+                task['correction'] = {'type': 'self', 'description': '', 'date': utilsCashierParts[2], 'document': 'самостоятельно'}
         if 'correction' in task:
             receipt.set_correction_info(
                 task['correction']['type'],
