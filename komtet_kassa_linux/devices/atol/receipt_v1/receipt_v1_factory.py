@@ -48,7 +48,7 @@ def receipt_v1_factory(driver, ffd_version, task):
             date=datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
             document=task['correction'].get('document')
         )
-    else:
+    if True: # getCorrectionChequePaymentAddressAvailability
         receipt.payment_address = task.get('payment_address')
 
     for position in task['positions']:
