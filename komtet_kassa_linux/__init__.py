@@ -1,14 +1,15 @@
 import logging
 import threading
 
+from pkg_resources import get_distribution
+
 from komtet_kassa_linux.km_manager import run as run_manager
-from komtet_kassa_linux.libs.helpers import get_version
 from komtet_kassa_linux.web import run as run_web
 
 
 logger = logging.getLogger(__name__)
 
-__version__ = get_version()
+__version__ = get_distribution('komtet_kassa_linux').version
 logger.info('Project version: %s', __version__)
 
 

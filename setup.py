@@ -1,13 +1,23 @@
 import os
+import re
 
 from setuptools import find_packages, setup
 
 with open('requirements.txt') as file:
     required = file.read().splitlines()
 
+version = 'undefined'
+if os.path.isfile('CHANGELOG.rst'):
+    with open('CHANGELOG.rst', 'r') as file:
+        for line in file:
+            ver = re.match(r'^[0-9]+\.[0-9]+\.[0-9]', line)
+            version = ver and ver.group(0)
+            if version:
+                break
+
 setup(
     name='komtet_kassa_linux',
-    version='5.0.2',
+    version=version,
     packages=find_packages(),
     author='Motmom',
     author_email='motmom.dev@gmail.com',
