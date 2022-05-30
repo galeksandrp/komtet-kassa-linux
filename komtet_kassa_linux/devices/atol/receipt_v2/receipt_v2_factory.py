@@ -12,13 +12,24 @@ def receipt_v2_factory(driver, ffd_version, task):
         Результат выполнения - сформированный объект receipt.
     '''
     receipt = ReceiptV2(driver, ffd_version)
-    receipt.set_intent(task['intent'])
+    if True: # getSellAndSellReturnAsCorrectionAvailability
+        utilsIntent = task['intent']
+        utilsCashierParts = task['cashier']['name'].split('_') # format: <cahierName>_<intent>_<originalDate format 2022-12-31>
+        if '_' in task['cashier']['name']:
+            if task['intent'] == utilsCashierParts[1]:
+                if task['intent'] == 'sell':
+                    utilsIntent = 'sellCorrection'
+                elif task['intent'] == 'sellReturn':
+                    utilsIntent = 'sellReturnCorrection'
+        receipt.set_intent(utilsIntent)
+    else:
+        receipt.set_intent(task['intent'])
 
     if True: # utilsGetChequeVATIDLessOperatorNameAvailability
         utilsOperator = ''
         utilsOperatorVATID = ''
         if task['cashier']:
-            utilsOperator = task['cashier']['name']
+            utilsOperator = utilsCashierParts[0]
         receipt.set_cashier(utilsOperator, utilsOperatorVATID)
     else:
         if task['cashier']:
@@ -54,6 +65,9 @@ def receipt_v2_factory(driver, ffd_version, task):
     if task.get('additional_check_props'):
         receipt.set_additional_check_props(task['additional_check_props'])
 
+    if True: # getSellAndSellReturnAsCorrectionAvailability
+        if '_' in task['cashier']['name'] and task['intent'] == utilsCashierParts[1]:
+            task['correction'] = {'type': 'self', 'description': '', 'date': utilsCashierParts[2], 'document': 'самостоятельно'}
     if 'correction' in task:
         receipt.set_correction_info(
             task['correction']['type'],
