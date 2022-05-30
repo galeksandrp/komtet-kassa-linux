@@ -5,7 +5,7 @@ import time
 
 import psutil
 
-from komtet_kassa_linux.devices import DeviceManager
+from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.models import Printer, change_event as change_db_event
 
 from .km import factory_km
@@ -60,7 +60,7 @@ class KmManager:
 
     def _start_km(self, printer):
         if printer.serial_number in self._km_threads:
-            logger.warn('KM[%s] was already run', printer.serial_number)
+            logger.warn(f'KM - {printer.serial_number}  was already run')
             self._stop_km(printer.serial_number)
 
         km = factory_km(printer, rent_station=self._rent_station)

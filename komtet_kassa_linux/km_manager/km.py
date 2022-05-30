@@ -4,9 +4,13 @@ import logging
 import os
 import shelve
 
-from komtet_kassa_linux.devices import DeviceManager, Receipt, Shift
-from komtet_kassa_linux.devices.kkt import KKT, INTERNET_SIGN
-from komtet_kassa_linux.devices.receipt import Agent, Supplier
+from komtet_kassa_linux.devices.atol import DeviceManager
+from komtet_kassa_linux.devices.atol.shift import Shift
+from komtet_kassa_linux.devices.atol.receipt import FFD_1_20
+from komtet_kassa_linux.devices.atol.receipt_v1 import receipt_v1_factory
+from komtet_kassa_linux.devices.atol.receipt_v2 import receipt_v2_factory
+from komtet_kassa_linux.devices.atol.kkt import KKT, INTERNET_SIGN
+from komtet_kassa_linux.driver import IFptr
 from komtet_kassa_linux.driver import ERROR_DENIED_IN_CLOSED_RECEIPT, Driver, DriverException
 from komtet_kassa_linux.libs.komtet_kassa import POS
 
@@ -16,10 +20,6 @@ logger = logging.getLogger(__name__)
 
 STORE_DIR = 'tmp/km_store/'
 os.makedirs(STORE_DIR, exist_ok=True)
-
-
-def to_decimal(value, rounding='.00'):
-    return decimal.Decimal(value).quantize(decimal.Decimal(rounding))
 
 
 class Store:
@@ -76,7 +76,7 @@ class BaseKM:
         except Exception:
             if fiscal_data:
                 receipt['__fiscal_data__'] = fiscal_data
-            logger.exception("Receipt didn't get")
+            logger.exception('Receipt didn\'t get')
         else:
             return bool(receipt)
         finally:
@@ -110,130 +110,75 @@ class KM(BaseKM):
         info.update({'rent_station': self.rent_station})
         return info
 
-    def create_receipt(self, task):
-        receipt = Receipt(self._driver, task['intent'])
-        if task['cashier'] and task['cashier_inn']:
-            receipt.set_cashier(task['cashier'], task['cashier_inn'])
-        if task.get('client'):
-            receipt.set_client(task['client'].get('inn'), task['client'].get('name'))
-        receipt.sno = task['sno']
-        receipt.email = task.get('user')
-
-        if 'correction' in task:
-            receipt.set_correction_info(
-                task['correction']['type'],
-                task['correction']['description'],
-                datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
-                task['correction']['document']
-            )
-        else:
-            receipt.payment_address = task.get('payment_address')
-
-        for position in task['positions']:
-            agent = supplier = None
-            if position.get('agent_info'):
-                info = position['agent_info']
-                agent = Agent(info['type'])
-                if info.get('paying_agent'):
-                    agent.set_paying_agent(info['paying_agent']['operation'],
-                                           info['paying_agent']['phones'])
-                if info.get('receive_payments_operator'):
-                    agent.set_receive_payments_operator(
-                        info['receive_payments_operator']['phones']
-                    )
-                if info.get('money_transfer_operator'):
-                    agent.set_money_transfer_operator(
-                        info['money_transfer_operator']['phones'],
-                        info['money_transfer_operator']['name'],
-                        info['money_transfer_operator']['address'],
-                        info['money_transfer_operator']['inn']
-                    )
-
-            if position.get('supplier_info'):
-                info = position['supplier_info']
-                supplier = Supplier(info['phones'], info['name'], info['inn'])
-
-            # Подсчет скидки на позицию
-            discount = position.get(
-                'discount',
-                position['price'] * position['quantity'] - position['total']
-            )
-            position_discount = to_decimal(discount / position['quantity'] if discount else 0)
-
-            quantity = position['quantity']
-            price = float(decimal.Decimal(position['price']) - position_discount)
-            total = float(decimal.Decimal(position['total']))
-
-            # Выявление позиций с погрешностью в тотал
-            has_extra_position = (total != price * quantity) and quantity > 1
-
-            if has_extra_position:
-                quantity -= 1
-
-            position_info = dict(
-                name=position['name'],
-                vat=position['vat']['number'],
-                measurement_unit=position.get('measure_name'),
-                payment_method=position.get('calculation_method'),
-                payment_object=position.get('calculation_subject'),
-                agent=agent, supplier=supplier,
-                nomenclature_code=position.get('nomenclature_code')
-            )
-
-            base_position_total = float(to_decimal(price * quantity))
-
-            receipt.add_position(price=price, quantity=quantity, total=base_position_total,
-                                 discount=discount, **position_info)
-
-            if has_extra_position:
-                price = total - base_position_total
-                receipt.add_position(price=price, quantity=1, total=price, **position_info)
-
-        for payment in task['payments']:
-            receipt.add_payment(payment['sum'], payment['type'])
-
-        return receipt
-
     def fiscalize_receipt(self, task):
-        report = {
-            "id": task['id'],
-            'inn': self._kkt.inn,
-            "kkt_serial_number": self._kkt.serial_number,
-            "kkt_reg_number": self._kkt.reg_number,
-            "fiscal_drive_id": self._kkt.fiscal_drive_id,
+        report = dict(
+            id=task['id'],
+            inn=self._kkt.inn,
+            kkt_serial_number=self._kkt.serial_number,
+            kkt_reg_number=self._kkt.reg_number,
+            fiscal_drive_id=self._kkt.fiscal_drive_id,
+            ofd_url=self._kkt.ofd_url,
+            organisation=self._kkt.organisation,
+            organisation_address=self._kkt.organisation_address
+        )
 
-            'ofd_url': self._kkt.ofd_url,
+        if task['version'] == 'v1':
+            report.update(dict(
+                sno=str(task.get('sno')),
+                cashier=task.get('cashier'),
+                cashier_inn=task.get('cashier_inn'),
+            ))
+        elif task['version'] == 'v2':
+            report.update(dict(
+                sno=str(task['company']['sno']),
+                cashier=task['cashier']['name'],
+                cashier_inn=task['cashier']['inn'],
+            ))
 
-            'sno': str(task.get('sno')),
-            'cashier': task.get('cashier'),
-            'organisation': self._kkt.organisation,
-            'organisation_address': self._kkt.organisation_address
-        }
-
-        if task.get('inn') != self._kkt.inn:
-            logger.warning("Некорректный ИНН чека: %s. ИНН ККМ: %s",
-                           task.get('inn'), self._kkt.inn)
+        ffd_version = self._kkt.ffd_version
+        check_inn = task.get('inn',
+                             task['company']['inn'] if task.get('company') else None)
+        if check_inn != self._kkt.inn:
+            logger.warning(f"Некорректный ИНН чека: {check_inn}. ИНН ККМ: {self._kkt.inn}")
             report['error_description'] = 'ИНН чека и ККМ не совпадают'
             return report
 
-        is_only_internet_sign = self._kkt.mode_signs[INTERNET_SIGN] and sum(self._kkt.mode_signs.values()) == 1
-        if is_only_internet_sign and not task.get('user'):
-            logger.warning("В режиме Интернет необходимы email/телефон клиента")
-            report['error_description'] = 'Отсутствует email/телефон клиента для режима Интернет'
+        is_only_internet_sign = (
+            self._kkt.mode_signs[INTERNET_SIGN] and sum(self._kkt.mode_signs.values()) == 1
+        )
+        client = task.get('user',
+                          task.get('client').get('email', task.get('client').get('phone'))
+                          if task.get('client') else None)
+        if is_only_internet_sign and not client:
+            logger.warning('В режиме Интернет обязательно необходимы email(телефон) клиента')
+            report['error_description'] = 'Отсутствует email(телефон) клиента для режима Интернет'
             return report
 
-        shift = Shift(self._driver, self._device['ID_SERIAL_SHORT'])
+        shift = Shift(self._driver, self._device['SERIAL_NUMBER'])
         shift.open()
 
-        receipt = self.create_receipt(task)
+        if task['version'] == 'v1':
+            try:
+                receipt = receipt_v1_factory(self._driver, ffd_version, task)
+            except Exception as exc:
+                report['error_description'] = str(exc)
+                return report
+
+        elif task['version'] == 'v2':
+            try:
+                receipt = receipt_v2_factory(self._driver, ffd_version, task)
+            except Exception as exc:
+                report['error_description'] = str(exc)
+                return report
+
         try:
             receipt.fiscalize(task.get('print'))
         except DriverException as exc:
-            logger.info('Ошибка фискализации чека: %s', repr(exc))
+            logger.info(f'Ошибка фискализации чека: {repr(exc)}')
             try:
-                receipt.cansel()
-            except DriverException as cansel_exc:
-                if cansel_exc.error_code != ERROR_DENIED_IN_CLOSED_RECEIPT:  # Чек не закрыт
+                receipt.cancel()
+            except DriverException as cancel_exc:
+                if cancel_exc.error_code != ERROR_DENIED_IN_CLOSED_RECEIPT:  # Чек не закрыт
                     raise exc
             finally:
                 report['error_description'] = str(exc)
@@ -256,13 +201,13 @@ class VirtualKM(BaseKM):
 
     def fiscalize_receipt(self, task):
         return {
-            "id": task['id'],
+            'id': task['id'],
             'inn': task['inn'],
-            "kkt_serial_number": self.printer.serial_number,
-            "kkt_reg_number": '0000000000000001',
-            "fiscal_drive_id": '0000000000000001',
+            'kkt_serial_number': self.printer.serial_number,
+            'kkt_reg_number': '0000000000000001',
+            'fiscal_drive_id': '0000000000000001',
 
-            'ofd_url': "ofdp.platformaofd.ru",
+            'ofd_url': 'ofdp.platformaofd.ru',
 
             'sno': str(task.get('sno')),
             'cashier': task.get('cashier'),

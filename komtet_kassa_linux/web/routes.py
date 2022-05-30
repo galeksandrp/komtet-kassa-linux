@@ -8,7 +8,8 @@ from requests.exceptions import HTTPError
 
 import komtet_kassa_linux
 from komtet_kassa_linux import settings
-from komtet_kassa_linux.devices import KKT, DeviceManager
+from komtet_kassa_linux.devices.atol import DeviceManager
+from komtet_kassa_linux.devices.atol.kkt import KKT
 from komtet_kassa_linux.driver import Driver
 from komtet_kassa_linux.libs import VIRTUAL_PRINTER_PREFIX
 from komtet_kassa_linux.libs.htpasswd import HtpasswdFile

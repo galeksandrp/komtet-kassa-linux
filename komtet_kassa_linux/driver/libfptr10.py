@@ -320,7 +320,75 @@ class IFptr(object):
         LIBFPTR_PARAM_REMOTE_CALL,
         LIBFPTR_PARAM_SCRIPT_PARAMS,
         LIBFPTR_PARAM_IGNORE_EMPTY,
-    ) = RANGE(65536, 65833)
+        LIBFPTR_PARAM_METHOD_DATA,
+        LIBFPTR_PARAM_METHOD_RESULT,
+        LIBFPTR_PARAM_RPC_SERVER_OS,
+        LIBFPTR_PARAM_RPC_SERVER_VERSION,
+        LIBFPTR_PARAM_RPC_DRIVER_VERSION,
+        LIBFPTR_PARAM_LOCKED,
+        LIBFPTR_PARAM_BOUND,
+        LIBFPTR_PARAM_COMMODITIES_TABLE_FAULT,
+        LIBFPTR_PARAM_HAS_ADDITIONAL_DATA,
+        LIBFPTR_PARAM_FISCAL_SIGN_ARCHIVE,
+        LIBFPTR_PARAM_COMMAND_GROUP,
+        LIBFPTR_PARAM_ERROR_CODE,
+        LIBFPTR_PARAM_MARKING_WAIT_FOR_VALIDATION_RESULT,
+        LIBFPTR_PARAM_MARKING_CODE_STATUS,
+        LIBFPTR_PARAM_MARKING_CODE_VALIDATION_RESULT,
+        LIBFPTR_PARAM_MARKING_CODE_OFFLINE_VALIDATION_ERROR,
+        LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR,
+        LIBFPTR_PARAM_MARKING_CODE_VALIDATION_READY,
+        LIBFPTR_PARAM_MEASUREMENT_UNIT,
+        LIBFPTR_PARAM_MARKING_PROCESSING_MODE,
+        LIBFPTR_PARAM_MARKING_FRACTIONAL_QUANTITY,
+        LIBFPTR_PARAM_PRODUCT_CODE,
+        LIBFPTR_PARAM_TRADE_MARKED_PRODUCTS,
+        LIBFPTR_PARAM_INSURANCE_ACTIVITY,
+        LIBFPTR_PARAM_PAWN_SHOP_ACTIVITY,
+        LIBFPTR_PARAM_TLV_LIST,
+        LIBFPTR_PARAM_CHECK_MARKING_SERVER_READY,
+        LIBFPTR_PARAM_MARKING_SERVER_RESPONSE_TIME,
+        LIBFPTR_PARAM_MARKING_SERVER_ERROR_CODE,
+        LIBFPTR_PARAM_MARKING_SERVER_ERROR_DESCRIPTION,
+        LIBFPTR_PARAM_ISM_ERROR,
+        LIBFPTR_PARAM_ISM_ERROR_TEXT,
+        LIBFPTR_PARAM_MARKING_MODE_CHECKING_STATUS,
+        LIBFPTR_PARAM_MARK_CHECKING_COUNT,
+        LIBFPTR_PARAM_MARK_SOLD_COUNT,
+        LIBFPTR_PARAM_NOTICE_IS_BEGIN,
+        LIBFPTR_PARAM_NOTICE_FREE_MEMORY,
+        LIBFPTR_PARAM_NOTICE_COUNT,
+        LIBFPTR_PARAM_MARKING_NOT_SEND_TO_SERVER,
+        LIBFPTR_PARAM_DOCUMENT_TYPE,
+        LIBFPTR_PARAM_PRINT_REPORT,
+        LIBFPTR_PARAM_FN_EXECUTION,
+        LIBFPTR_PARAM_MCU_SN,
+        LIBFPTR_PARAM_MCU_PART_ID,
+        LIBFPTR_PARAM_MCU_PART_NAME,
+        LIBFPTR_PARAM_IS_REQUEST_SENT,
+        LIBFPTR_PARAM_FN_CHECK_MARK_TIME,
+        LIBFPTR_PARAM_SENDING_MARK_TIME,
+        LIBFPTR_PARAM_MARKING_SERVER_EXCHANGE_TIME,
+        LIBFPTR_PARAM_FULL_SENDING_MARK_TIME,
+        LIBFPTR_PARAM_MARK_CHECKING_STATUS_IN_CASH,
+        LIBFPTR_PARAM_MARK_CHECKING_TYPE_IN_CASH,
+        LIBFPTR_PARAM_MARK_CHECKING_STAGE_IN_CASH,
+        LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT,
+        LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR_DESCRIPTION,
+        LIBFPTR_PARAM_FN_CONTAINS_KEYS_UPDATER_SERVER_URI,
+        LIBFPTR_PARAM_MARKING_CODE_CLEAR,
+        LIBFPTR_PARAM_MODULE_ADDRESS,
+        LIBFPTR_PARAM_SEGMENT_ADDRESS,
+        LIBFPTR_PARAM_LAST_SUCCESSFUL_OKP,
+        LIBFPTR_PARAM_FN_SERIAL_NUMBER,
+        LIBFPTR_PARAM_ECR_REGISTRATION_NUMBER,
+        LIBFPTR_PARAM_OFD_VATIN,
+        LIBFPTR_PARAM_FNS_URL,
+        LIBFPTR_PARAM_MARKING_PRODUCT_ID,
+        LIBFPTR_PARAM_TIMEOUT,
+        LIBFPTR_PARAM_PRINT_UPDATE_FNM_KEYS_REPORT,
+        LIBFPTR_PARAM_FN_KEYS_UPDATER_SERVER_URI,
+    ) = RANGE(65536, 65901)
 
     (
         LIBFPTR_OK,
@@ -575,7 +643,55 @@ class IFptr(object):
         LIBFPTR_ERROR_DOCUMENT_CANCELED,
         LIBFPTR_ERROR_INVALID_SCRIPT_PARAMS,
         LIBFPTR_ERROR_CLICHE_TOO_LONG,
-    ) = RANGE(0, 252)
+        LIBFPTR_ERROR_COMMODITIES_TABLE_FAULT,
+        LIBFPTR_ERROR_COMMODITIES_TABLE,
+        LIBFPTR_ERROR_COMMODITIES_TABLE_INVALID_TAG,
+        LIBFPTR_ERROR_COMMODITIES_TABLE_INVALID_TAG_SIZE,
+        LIBFPTR_ERROR_COMMODITIES_TABLE_NO_TAG_DATA,
+        LIBFPTR_ERROR_COMMODITIES_TABLE_NO_FREE_MEMORY,
+        LIBFPTR_ERROR_INVALID_CACHE,
+        LIBFPTR_ERROR_SCHEDULER_NOT_READY,
+        LIBFPTR_ERROR_SCHEDULER_INVALID_TASK,
+        LIBFPTR_ERROR_MINIPOS_NO_POSITION_PAYMENT,
+        LIBFPTR_ERROR_MINIPOS_COMMAND_TIME_OUT,
+        LIBFPTR_ERROR_MINIPOS_MODE_FR_DISABLED,
+        LIBFPTR_ERROR_ENTRY_NOT_FOUND_IN_OTP,
+        LIBFPTR_ERROR_EXCISABLE_COMMODITY_WITHOUT_EXCISE,
+        LIBFPTR_ERROR_BARCODE_TYPE_NOT_SUPPORTED,
+        LIBFPTR_ERROR_OVERLAY_DATA_OVERFLOW,
+        LIBFPTR_ERROR_INVALID_MODULE_ADDRESS,
+        LIBFPTR_ERROR_ECR_MODEL_NOT_SUPPORTED,
+    ) = RANGE(0, 270)
+
+    (
+        LIBFPTR_ERROR_BASE_MARKING,
+        LIBFPTR_ERROR_MARKING_CODE_VALIDATION_IN_PROGRESS,
+        LIBFPTR_ERROR_NO_CONNECTION_WITH_SERVER,
+        LIBFPTR_ERROR_MARKING_CODE_VALIDATION_CANCELED,
+        LIBFPTR_ERROR_INVALID_MARKING_CODE_STATUS,
+        LIBFPTR_ERROR_INVALID_GS1,
+        LIBFPTR_ERROR_MARKING_WORK_DENIED,
+        LIBFPTR_ERROR_MARKING_WORK_TEMPORARY_BLOCKED,
+        LIBFPTR_ERROR_MARKS_OVERFLOW,
+        LIBFPTR_ERROR_INVALID_MARKING_CODE,
+        LIBFPTR_ERROR_INVALID_STATE,
+        LIBFPTR_ERROR_OFD_EXCHANGE,
+        LIBFPTR_ERROR_INVALID_MEASUREMENT_UNIT,
+        LIBFPTR_ERROR_OPERATION_DENIED_IN_CURRENT_FFD,
+        LIBFPTR_ERROR_MARKING_OPERATION_DENIED,
+        LIBFPTR_ERROR_NO_DATA_TO_SEND,
+        LIBFPTR_ERROR_NO_MARKED_POSITION,
+        LIBFPTR_ERROR_HAS_NOT_SEND_NOTICES,
+        LIBFPTR_ERROR_UPDATE_KEYS_REQUIRED,
+        LIBFPTR_ERROR_UPDATE_KEYS_SERVICE,
+        LIBFPTR_ERROR_MARK_NOT_CHECKED,
+        LIBFPTR_ERROR_MARK_CHECK_TIMEOUT_EXPIRED,
+        LIBFPTR_ERROR_NO_MARKING_CODE_IN_TABLE,
+        LIBFPTR_ERROR_CHEKING_MARK_IN_PROGRESS,
+        LIBFPTR_ERROR_INVALID_SERVER_ADDRESS,
+        LIBFPTR_ERROR_UPDATE_KEYS_TIMEOUT,
+        LIBFPTR_ERROR_PROPERTY_FOR_MARKING_POSITION_ONLY,
+    ) = RANGE(400, 427)
 
     (
         LIBFPTR_ERROR_BASE_WEB,
@@ -737,7 +853,8 @@ class IFptr(object):
         LIBFPTR_TAX_NO,
         LIBFPTR_TAX_VAT20,
         LIBFPTR_TAX_VAT120,
-    ) = RANGE(0, 9)
+        LIBFPTR_TAX_INVALID,
+    ) = RANGE(0, 10)
 
     (
         LIBFPTR_EXTERNAL_DEVICE_DISPLAY,
@@ -795,7 +912,12 @@ class IFptr(object):
         LIBFPTR_DT_SHIFT_TOTALS,
         LIBFPTR_DT_WIFI_INFO,
         LIBFPTR_DT_FONT_INFO,
-    ) = RANGE(0, 48)
+        LIBFPTR_DT_SOFTLOCK_STATUS,
+        LIBFPTR_DT_LAST_SENT_ISM_NOTICE_DATE_TIME,
+        LIBFPTR_DT_MCU_INFO,
+        LIBFPTR_DT_MODULE_ADDRESS,
+        LIBFPTR_DT_CACHE_REQUISITES,
+    ) = RANGE(0, 53)
 
     (
         LIBFPTR_FNDT_TAG_VALUE,
@@ -817,7 +939,11 @@ class IFptr(object):
         LIBFPTR_FNDT_VALIDITY_DAYS,
         LIBFPTR_FNDT_FREE_MEMORY,
         LIBFPTR_FNDT_TOTALS,
-    ) = RANGE(0, 19)
+        LIBFPTR_FNDT_ISM_ERRORS,
+        LIBFPTR_FNDT_ISM_EXCHANGE_STATUS,
+        LIBFPTR_FNDT_MARKING_MODE_STATUS,
+        LIBFPTR_FNDT_CHECK_MARK_TIME,
+    ) = RANGE(0, 23)
 
     (
         LIBFPTR_UT_FIRMWARE,
@@ -858,7 +984,8 @@ class IFptr(object):
         LIBFPTR_RT_FN_QUANTITY_COUNTERS,
         LIBFPTR_RT_FN_UNSENT_DOCS_COUNTERS,
         LIBFPTR_RT_SETTINGS,
-    ) = RANGE(0, 11)
+        LIBFPTR_RT_RUN_COMMAND,
+    ) = RANGE(0, 12)
 
     (
         LIBFPTR_LOG_ERROR,
@@ -927,7 +1054,8 @@ class IFptr(object):
         LIBFPTR_SCRIPT_EXECUTABLE,
         LIBFPTR_SCRIPT_JSON,
         LIBFPTR_SCRIPT_SETTINGS,
-    ) = RANGE(0, 3)
+        LIBFPTR_SCRIPT_LIBRARY,
+    ) = RANGE(0, 4)
 
     (
         LIBFPTR_UCL_UNUSED,
@@ -952,6 +1080,92 @@ class IFptr(object):
         LIBFPTR_MCT_EGAIS_20,
         LIBFPTR_MCT_EGAIS_30,
     ) = RANGE(0, 3)
+
+    (
+        LIBFPTR_MCT12_UNKNOWN,
+        LIBFPTR_MCT12_SHORT,
+        LIBFPTR_MCT12_88_CHECK,
+        LIBFPTR_MCT12_44_NO_CHECK,
+        LIBFPTR_MCT12_44_CHECK,
+        LIBFPTR_MCT12_4_NO_CHECK,
+    ) = RANGE(0, 6)
+
+    (
+        LIBFPTR_MES_PIECE_SOLD,
+        LIBFPTR_MES_DRY_FOR_SALE,
+        LIBFPTR_MES_PIECE_RETURN,
+        LIBFPTR_MES_DRY_RETURN,
+    ) = RANGE(1, 5)
+
+    (
+        LIBFPTR_MCS_BLOCK,
+        LIBFPTR_MCS_NO_MARK_FOR_CHECK,
+        LIBFPTR_MCS_MARK_RECEIVE_B1,
+        LIBFPTR_MCS_MARK_STATE_QUERY_B5,
+        LIBFPTR_MCS_MARK_STATE_ANSWER_B6,
+    ) = RANGE(0, 5)
+
+    (
+        LIBFPTR_NFM_LESS_50_PERCENT,
+        LIBFPTR_NFM_FROM_50_TO_80_PERCENT,
+        LIBFPTR_NFM_FROM_80_TO_90_PERCENT,
+        LIBFPTR_NFM_MORE_90_PERCENT,
+        LIBFPTR_NFM_OUT_OF_MEMORY,
+    ) = RANGE(0, 5)
+
+    (
+        LIBFPTR_OIS_ESTIMATED_STATUS_CORRECT,
+        LIBFPTR_OIS_ESTIMATED_STATUS_INCORRECT,
+        LIBFPTR_OIS_SALE_STOPPED,
+    ) = RANGE(1, 4)
+
+    (
+        LIBFPTR_ORR_CORRECT,
+        LIBFPTR_ORR_INCORRECT,
+        LIBFPTR_ORR_UNRECOGNIZED,
+    ) = RANGE(0, 3)
+
+    (
+        LIBFPTR_CER_CHECKED,
+        LIBFPTR_CER_TYPE_INCORRECT,
+        LIBFPTR_CER_NO_KEYS,
+        LIBFPTR_CER_NO_GS1,
+        LIBFPTR_CER_OTHER,
+    ) = RANGE(0, 5)
+
+    (
+        LIBFPTR_MCS_NOT_EXECUTED,
+        LIBFPTR_MCS_EXECUTED,
+        LIBFPTR_MCS_IS_OVER,
+        LIBFPTR_MCS_RESULT_IS_RECIEVED,
+    ) = RANGE(0, 4)
+
+    (
+        LIBFPTR_MCT_AUTONOMOUS,
+        LIBFPTR_MCT_WAIT_FOR_RESULT,
+        LIBFPTR_MCT_RESULT_NOT_WAIT,
+        LIBFPTR_MCT_QUERY_NOT_SEND,
+    ) = RANGE(0, 4)
+
+    (
+        LIBFPTR_MCST_WAITING_FOR_TASK,
+        LIBFPTR_MCST_OPENING_CONNECTION,
+        LIBFPTR_MCST_SENDING,
+        LIBFPTR_MCST_WAITING_FOR_RESULT,
+        LIBFPTR_MCST_GETTING_RESULT,
+        LIBFPTR_MCST_DECODE_RESULT,
+        LIBFPTR_MCST_TASK_IS_OVER,
+        LIBFPTR_MCST_WAITING_FOR_REPEAT,
+    ) = RANGE(0, 8)
+
+    (
+        LIBFPTR_ERROR_BASE_RPC,
+        LIBFPTR_ERROR_RCP_SERVER_BUSY,
+        LIBFPTR_ERROR_RCP_SERVER_VERSION,
+        LIBFPTR_ERROR_RCP_SERVER_EXCHANGE,
+    ) = RANGE(600, 604)
+
+    LIBFPTR_ERROR_MARKING_END = 499
 
     LIBFPTR_ERROR_WEB_END = 599
 
@@ -1003,6 +1217,14 @@ class IFptr(object):
 
     LIBFPTR_SETTING_INVERT_CASH_DRAWER_STATUS = "InvertCashDrawerStatus"
 
+    LIBFPTR_SETTING_REMOTE_SERVER_ADDR = "RemoteServerAddr"
+
+    LIBFPTR_SETTING_REMOTE_SERVER_CONNECTION_TIMEOUT = "RemoteServerConnectionTimeout"
+
+    LIBFPTR_SETTING_VALIDATE_MARK_WITH_FNM_ONLY = "ValidateMarksWithFnmOnly"
+
+    LIBFPTR_SETTING_AUTO_MEASUREMENT_UNIT = "AutoMeasurementUnit"
+
     LIBFPTR_MODEL_UNKNOWN = 0
 
     LIBFPTR_MODEL_ATOL_25F = 57
@@ -1047,7 +1269,13 @@ class IFptr(object):
 
     LIBFPTR_MODEL_KAZNACHEY_FA = 76
 
+    LIBFPTR_MODEL_ATOL_22V2F = 95
+
     LIBFPTR_MODEL_ATOL_AUTO = 500
+
+    LIBFPTR_MODEL_ATOL_47FA = 48
+
+    LIBFPTR_MODEL_ATOL_PT_5F = 89
 
     LIBFPTR_PORT_BR_1200 = 1200
 
@@ -1107,6 +1335,8 @@ class IFptr(object):
 
     LIBFPTR_FFD_1_1 = 110
 
+    LIBFPTR_FFD_1_2 = 120
+
     LIBFPTR_TT_DEFAULT = 0
 
     LIBFPTR_TT_OSN = 1
@@ -1136,6 +1366,38 @@ class IFptr(object):
     LIBFPTR_AT_COMMISSION_AGENT = 32
 
     LIBFPTR_AT_ANOTHER = 64
+
+    LIBFPTR_DT_CLOSED = 0
+
+    LIBFPTR_DT_RECEIPT_SELL = 1
+
+    LIBFPTR_DT_RECEIPT_SELL_RETURN = 2
+
+    LIBFPTR_DT_RECEIPT_BUY = 3
+
+    LIBFPTR_DT_RECEIPT_BUY_RETURN = 4
+
+    LIBFPTR_DT_OPEN_SHIFT = 5
+
+    LIBFPTR_DT_CLOSE_SHIFT = 6
+
+    LIBFPTR_DT_REGISTRATION = 7
+
+    LIBFPTR_DT_CLOSE_ARCHIVE = 8
+
+    LIBFPTR_DT_OFD_EXCHANGE_STATUS = 11
+
+    LIBFPTR_DT_RECEIPT_SELL_CORRECTION = 12
+
+    LIBFPTR_DT_RECEIPT_SELL_RETURN_CORRECTION = 13
+
+    LIBFPTR_DT_RECEIPT_BUY_CORRECTION = 14
+
+    LIBFPTR_DT_RECEIPT_BUY_RETURN_CORRECTION = 15
+
+    LIBFPTR_DT_DOCUMENT_SERVICE = 20
+
+    LIBFPTR_DT_DOCUMENT_COPY = 21
 
     LIBFPTR_FN_DOC_REGISTRATION = 1
 
@@ -1173,9 +1435,63 @@ class IFptr(object):
 
     LIBFPTR_UC_OTHERS = 4294967295
 
+    LIBFPTR_MCT12_AUTO = 256
+
+    LIBFPTR_MES_UNCHANGED = 255
+
+    LIBFPTR_IU_PIECE = 0
+
+    LIBFPTR_IU_GRAM = 10
+
+    LIBFPTR_IU_KILOGRAM = 11
+
+    LIBFPTR_IU_TON = 12
+
+    LIBFPTR_IU_CENTIMETER = 20
+
+    LIBFPTR_IU_DECIMETER = 21
+
+    LIBFPTR_IU_METER = 22
+
+    LIBFPTR_IU_SQUARE_CENTIMETER = 30
+
+    LIBFPTR_IU_SQUARE_DECIMETER = 31
+
+    LIBFPTR_IU_SQUARE_METER = 32
+
+    LIBFPTR_IU_MILLILITER = 40
+
+    LIBFPTR_IU_LITER = 41
+
+    LIBFPTR_IU_CUBIC_METER = 42
+
+    LIBFPTR_IU_KILOWATT_HOUR = 50
+
+    LIBFPTR_IU_GKAL = 51
+
+    LIBFPTR_IU_DAY = 70
+
+    LIBFPTR_IU_HOUR = 71
+
+    LIBFPTR_IU_MINUTE = 72
+
+    LIBFPTR_IU_SECOND = 73
+
+    LIBFPTR_IU_KILOBYTE = 80
+
+    LIBFPTR_IU_MEGABYTE = 81
+
+    LIBFPTR_IU_GIGABYTE = 82
+
+    LIBFPTR_IU_TERABYTE = 83
+
+    LIBFPTR_IU_OTHER = 255
+
     LIBFPTR_ERROR_USERS_SCRIPTS_BASE = 1000
 
     LIBFPTR_ERROR_USERS_SCRIPTS_END = 1999
+
+    LIBFPTR_ERROR_RPC_END = 699
 
     DEFAULT_BUFF_SIZE = 512
 
@@ -1288,6 +1604,10 @@ class IFptr(object):
                                               ctypes.c_int,
                                               ctypes.c_void_p)
 
+    CHANGE_LABEL_METHOD = ctypes.CFUNCTYPE(ctypes.c_int,
+                                           ctypes.c_void_p,
+                                           ctypes.c_wchar_p)
+
     def __init__(self, lib_path="", fptr_id=""):
         assert sys.version_info >= (2, 6)
         self.lib_path = lib_path
@@ -1387,6 +1707,7 @@ class IFptr(object):
         self._resetError = self.RESET_ERROR_METHOD(('libfptr_reset_error', self.library))
         self._logWrite = self.LOG_WRITE_METHOD(('libfptr_log_write_ex', self.library))
         self._showProperties = self.SHOW_PROPERTIES_METHOD(('libfptr_show_properties', self.library))
+        self._changeLabel = self.CHANGE_LABEL_METHOD(('libfptr_change_label', self.library))
 
     def __del__(self):
         destroy = self.DESTROY_METHOD(('libfptr_destroy', self.library))
@@ -1397,6 +1718,9 @@ class IFptr(object):
 
     def logWrite(self, tag, level, message):
         return self._logWrite(self.interface, tag, level, message)
+
+    def changeLabel(self, label):
+        return self._changeLabel(self.interface, label)
 
     def showProperties(self, parentType, parent):
         return self._showProperties(self.interface, parentType, parent)
@@ -1448,7 +1772,7 @@ class IFptr(object):
     def setParam(self, paramId, param):
         if isinstance(param, bool):
             self._setBool(self.interface, ctypes.c_int(paramId), ctypes.c_int(param))
-        elif isinstance(param, int):
+        elif isinstance(param, int) or (sys.version_info < (3, 0) and isinstance(param, long)):
             if param < 0 or param > 4294967295:
                 raise ValueError("Invalid 'param' value {0}".format(param))
             self._setInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
@@ -1970,4 +2294,64 @@ class IFptr(object):
 
     def validateJson(self):
         _method = self.METHOD(('libfptr_validate_json', self.library))
+        return _method(self.interface)
+
+    def reflectionCall(self):
+        _method = self.METHOD(('libfptr_reflection_call', self.library))
+        return _method(self.interface)
+
+    def getRemoteServerInfo(self):
+        _method = self.METHOD(('libfptr_get_remote_server_info', self.library))
+        return _method(self.interface)
+
+    def beginMarkingCodeValidation(self):
+        _method = self.METHOD(('libfptr_begin_marking_code_validation', self.library))
+        return _method(self.interface)
+
+    def cancelMarkingCodeValidation(self):
+        _method = self.METHOD(('libfptr_cancel_marking_code_validation', self.library))
+        return _method(self.interface)
+
+    def getMarkingCodeValidationStatus(self):
+        _method = self.METHOD(('libfptr_get_marking_code_validation_status', self.library))
+        return _method(self.interface)
+
+    def acceptMarkingCode(self):
+        _method = self.METHOD(('libfptr_accept_marking_code', self.library))
+        return _method(self.interface)
+
+    def declineMarkingCode(self):
+        _method = self.METHOD(('libfptr_decline_marking_code', self.library))
+        return _method(self.interface)
+
+    def updateFnmKeys(self):
+        _method = self.METHOD(('libfptr_update_fnm_keys', self.library))
+        return _method(self.interface)
+
+    def writeSalesNotice(self):
+        _method = self.METHOD(('libfptr_write_sales_notice', self.library))
+        return _method(self.interface)
+
+    def checkMarkingCodeValidationsReady(self):
+        _method = self.METHOD(('libfptr_check_marking_code_validations_ready', self.library))
+        return _method(self.interface)
+
+    def clearMarkingCodeValidationResult(self):
+        _method = self.METHOD(('libfptr_clear_marking_code_validation_result', self.library))
+        return _method(self.interface)
+
+    def pingMarkingServer(self):
+        _method = self.METHOD(('libfptr_ping_marking_server', self.library))
+        return _method(self.interface)
+
+    def getMarkingServerStatus(self):
+        _method = self.METHOD(('libfptr_get_marking_server_status', self.library))
+        return _method(self.interface)
+
+    def isDriverLocked(self):
+        _method = self.METHOD(('libfptr_is_driver_locked', self.library))
+        return _method(self.interface)
+
+    def getLastDocumentJournal(self):
+        _method = self.METHOD(('libfptr_get_last_document_journal', self.library))
         return _method(self.interface)
