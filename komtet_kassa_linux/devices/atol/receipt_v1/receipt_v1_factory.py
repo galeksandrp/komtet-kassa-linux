@@ -14,8 +14,15 @@ def receipt_v1_factory(driver, ffd_version, task):
     receipt = ReceiptV1(driver, ffd_version)
     receipt.set_intent(task['intent'])
 
-    if task['cashier'] and task['cashier_inn']:
-        receipt.set_cashier(task['cashier'], task['cashier_inn'])
+    if True: # utilsGetChequeVATIDLessOperatorNameAvailability
+        utilsOperator = ''
+        utilsOperatorVATID = ''
+        if task['cashier']:
+            utilsOperator = task['cashier']
+        receipt.set_cashier(utilsOperator, utilsOperatorVATID)
+    else:
+        if task['cashier'] and task['cashier_inn']:
+            receipt.set_cashier(task['cashier'], task['cashier_inn'])
 
     if task.get('client'):
         receipt.set_client(task['client'].get('inn'), task['client'].get('name'))
