@@ -2,13 +2,12 @@ import os
 
 from setuptools import find_packages, setup
 
-
 with open('requirements.txt') as file:
     required = file.read().splitlines()
 
 setup(
     name='komtet_kassa_linux',
-    version=os.environ.get('VERSION', 'undefined'),
+    version='5.0.1',
     packages=find_packages(),
     author='Motmom',
     author_email='motmom.dev@gmail.com',

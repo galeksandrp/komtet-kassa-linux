@@ -56,3 +56,15 @@ def prepare_dict(old_dict):
             new_dict.update({key: value})
 
     return new_dict
+
+
+def get_version():
+    version = 'undefined'
+    with open('CHANGELOG.rst', 'r') as file:
+        for line in file:
+            ver = re.match(r'^[0-9]+\.[0-9]+\.[0-9]', line)
+            version = ver and ver.group(0)
+            if version:
+                break
+
+    return version
