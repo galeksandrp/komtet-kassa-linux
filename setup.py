@@ -19,6 +19,7 @@ setup(
         'pyudev==0.22.0',
         'raven==6.10.0',
         'requests==2.23.0',
+        'itsdangerous==2.0.1'
     ],
     include_package_data=True,
     zip_safe=False,

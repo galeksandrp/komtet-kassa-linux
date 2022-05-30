@@ -5,3 +5,4 @@ psutil==5.7.0
 pyudev==0.22.0
 raven==6.10.0
 requests==2.23.0
+itsdangerous==2.0.1
