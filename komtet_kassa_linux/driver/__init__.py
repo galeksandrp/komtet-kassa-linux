@@ -25,15 +25,22 @@ ERROR_DENIED_IN_CLOSED_RECEIPT = IFptr.LIBFPTR_ERROR_DENIED_IN_CLOSED_RECEIPT
 
 
 def factory_driver(device):
-    fptr = IFptr(os.path.join(LIBRARY_PATH, "libfptr10.so"))
-    fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_LIBRARY_PATH, LIBRARY_PATH)
+    if True: # utilsGetWinAvailability
+        fptr = IFptr()
+    else:
+        fptr = IFptr(os.path.join(LIBRARY_PATH, "libfptr10.so"))
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_LIBRARY_PATH, LIBRARY_PATH)
     fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_MODEL, str(IFptr.LIBFPTR_MODEL_ATOL_AUTO))
-    fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_OFD_CHANNEL, str(IFptr.LIBFPTR_OFD_CHANNEL_AUTO))
+    if True: # utilsGetWinAvailability
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_OFD_CHANNEL, str(IFptr.LIBFPTR_OFD_CHANNEL_NONE))
+    else:
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_OFD_CHANNEL, str(IFptr.LIBFPTR_OFD_CHANNEL_AUTO))
 
     # fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_PORT, str(IFptr.LIBFPTR_PORT_COM))
     # fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_COM_FILE, device['DEVPATH'])
     fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_PORT, str(IFptr.LIBFPTR_PORT_USB))
-    fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_USB_DEVICE_PATH, device['DEVPATH'].split('/')[-1])
+    if False: # utilsGetWinAvailability
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_USB_DEVICE_PATH, device['DEVPATH'].split('/')[-1])
 
     fptr.applySingleSettings()
     return fptr

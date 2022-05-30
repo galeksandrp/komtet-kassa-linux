@@ -128,6 +128,7 @@ class KM(BaseKM):
         self._driver = Driver(self._device)
         try:
             self._kkt = KKT(self._driver)
+            self.utilsDeviceInfo = self.get_device_info_real()
             report = self.fiscalize_receipt_real(task)
         finally:
             self._driver.destroy()
