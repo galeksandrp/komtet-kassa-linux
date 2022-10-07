@@ -202,18 +202,27 @@ class VirtualKM(BaseKM):
     def fiscalize_receipt(self, task):
         return {
             'id': task['id'],
-            'inn': task['inn'],
+            'inn': (task['company']['inn']
+                    if task['version'] == 'v2'
+                    else task['inn']),
             'kkt_serial_number': self.printer.serial_number,
             'kkt_reg_number': '0000000000000001',
             'fiscal_drive_id': '0000000000000001',
 
             'ofd_url': 'ofdp.platformaofd.ru',
 
-            'sno': str(task.get('sno')),
-            'cashier': task.get('cashier'),
-            'organisation': task.get('org_name') or '',
-            'organisation_address': task.get('org_address') or '',
-
+            'sno': (str(task['company']['sno'])
+                    if task['version'] == 'v2'
+                    else str(task.get('sno'))),
+            'cashier': (task['cashier']['name']
+                        if task['version'] == 'v2'
+                        else task.get('cashier')),
+            'organisation': (task['company']['name']
+                             if task['version'] == 'v2'
+                             else task.get('org_name') or ''),
+            'organisation_address': (task['company']['place_address']
+                                     if task['version'] == 'v2'
+                                     else task.get('org_address') or ''),
             'fiscal_document_number': '1',
             'sum': sum([payment['sum'] for payment in task.get("payments")]),
             'fiscal_id': '0000000001',
