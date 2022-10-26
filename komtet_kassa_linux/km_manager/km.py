@@ -1,17 +1,14 @@
 import datetime
-import decimal
 import logging
 import os
 import shelve
 
 from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.devices.atol.shift import Shift
-from komtet_kassa_linux.devices.atol.receipt import FFD_1_20
 from komtet_kassa_linux.devices.atol.receipt_v1 import receipt_v1_factory
 from komtet_kassa_linux.devices.atol.receipt_v2 import receipt_v2_factory
 from komtet_kassa_linux.devices.atol.kkt import KKT, INTERNET_SIGN
-from komtet_kassa_linux.driver import IFptr
-from komtet_kassa_linux.driver import ERROR_DENIED_IN_CLOSED_RECEIPT, Driver, DriverException
+from komtet_kassa_linux.devices.atol.driver import ERROR_DENIED_IN_CLOSED_RECEIPT, Driver, DriverException
 from komtet_kassa_linux.libs.komtet_kassa import POS
 
 
@@ -60,6 +57,7 @@ class BaseKM:
 
         device_info = self.get_device_info()
         fiscal_data = None
+        receipt = {}
         if 'error_description' not in device_info:
             receipt = self.store.get()
             if receipt:
@@ -101,13 +99,17 @@ class KM(BaseKM):
     def get_device_info(self):
         try:
             info = self._kkt.get_info()
+            self.printer.is_online = True
         except DriverException as exc:
             info = {
-                'serial_number': self._kkt.serial_number,
                 'error_description': str(exc)
             }
+            self.printer.is_online = False
+            # Если происходит обрыв соединения, перерегистрируем устройство
+            self._driver.reconnect()
 
         info.update({'rent_station': self.rent_station})
+
         return info
 
     def fiscalize_receipt(self, task):
@@ -154,7 +156,7 @@ class KM(BaseKM):
             report['error_description'] = 'Отсутствует email(телефон) клиента для режима Интернет'
             return report
 
-        shift = Shift(self._driver, self._device['SERIAL_NUMBER'])
+        shift = Shift(self._driver, self._device.serial_number)
         shift.open()
 
         if task['version'] == 'v1':

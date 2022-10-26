@@ -10,13 +10,15 @@ import komtet_kassa_linux
 from komtet_kassa_linux import settings
 from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.devices.atol.kkt import KKT
-from komtet_kassa_linux.driver import Driver
+from komtet_kassa_linux.devices.atol.driver import Driver
 from komtet_kassa_linux.libs import VIRTUAL_PRINTER_PREFIX
 from komtet_kassa_linux.libs.htpasswd import HtpasswdFile
 from komtet_kassa_linux.libs.komtet_kassa import POS
 from komtet_kassa_linux.models import Printer, change_event
 
 from . import app
+
+CONNECTION_TYPES = USB, TCP, VIRTUAL = 'usb', 'tcp', 'virtual'
 
 
 logger = logging.getLogger(__name__)
@@ -40,25 +42,57 @@ def registrate_printer():
     error = None
     device_manager = DeviceManager()
 
+    connection_type = request.args.get('type', USB)
+
     if request.method == 'POST':
         pos = POS(request.form['pos_key'], request.form['pos_secret'])
-        try:
-            pos.activate(request.form['serial_number'], settings.LEASE_STATION)
-        except HTTPError as exc:
-            error = exc.response.json()['description']
-            logger.warning('Activation error: %s', error)
-        else:
-            device = device_manager.get(request.form['serial_number'])
-            printer = Printer(devname=device and device['DEVPATH'],
-                              **request.form.to_dict()).save()
-            logger.info('Add %s', printer)
-            change_event.set()
-            return redirect(url_for('devices'))
+
+        if connection_type == USB:
+            try:
+                pos.activate(request.form['serial_number'], settings.LEASE_STATION)
+            except HTTPError as exc:
+                error = exc.response.json()['description']
+                logger.warning('Activation error: %s', error)
+            else:
+                device = device_manager.get(request.form['serial_number'])
+                printer = Printer(devname=device and device.devpath,
+                                  **request.form.to_dict()).save()
+                logger.info('Add %s', printer)
+                change_event.set()
+
+        elif connection_type == TCP:
+            device = device_manager.connect_tcp_device(request.form['ip'])
+
+            try:
+                pos.activate(device.serial_number, settings.LEASE_STATION)
+            except HTTPError as exc:
+                error = exc.response.json()['description']
+                logger.warning('Activation error: %s', error)
+            else:
+                printer = Printer(serial_number=device.serial_number,
+                                  **request.form.to_dict()).save()
+                logger.info('Add %s', printer)
+                change_event.set()
+
+        elif connection_type == VIRTUAL:
+            try:
+                pos.activate(request.form['serial_number'], settings.LEASE_STATION)
+            except HTTPError as exc:
+                error = exc.response.json()['description']
+                logger.warning('Activation error: %s', error)
+            else:
+                printer = Printer(is_virtual=True, **request.form.to_dict()).save()
+                logger.info('Add %s', printer)
+                change_event.set()
+
+        return redirect(url_for('devices'))
 
     actived_devices = Printer.query.all()
     devices = filter(lambda serial_number: serial_number not in actived_devices,
                      device_manager.list())
+
     return render_template('registrate_printer.html',
+                           connection_type=connection_type,
                            printers=devices,
                            vprinter_sn=VIRTUAL_PRINTER_PREFIX + str(int(time.time() * 10000000)),
                            error=error)

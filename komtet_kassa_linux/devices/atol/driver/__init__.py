@@ -3,12 +3,10 @@ import logging
 import os
 import platform
 import time
-import types
 from contextlib import contextmanager
 from threading import Lock
 
 from .libfptr10 import IFptr
-
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +28,12 @@ def factory_driver(device):
     fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_MODEL, str(IFptr.LIBFPTR_MODEL_ATOL_AUTO))
     fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_OFD_CHANNEL, str(IFptr.LIBFPTR_OFD_CHANNEL_AUTO))
 
-    # fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_PORT, str(IFptr.LIBFPTR_PORT_COM))
-    # fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_COM_FILE, device['DEVPATH'])
-    fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_PORT, str(IFptr.LIBFPTR_PORT_USB))
-    fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_USB_DEVICE_PATH, device['DEVPATH'].split('/')[-1])
+    if hasattr(device, 'devpath'):
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_PORT, str(IFptr.LIBFPTR_PORT_USB))
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_USB_DEVICE_PATH, device.devpath.split('/')[-1])
+    elif hasattr(device, 'ip_address'):
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_PORT, str(IFptr.LIBFPTR_PORT_TCPIP))
+        fptr.setSingleSetting(IFptr.LIBFPTR_SETTING_IPADDRESS, device.ip_address)
 
     fptr.applySingleSettings()
     return fptr
@@ -57,7 +57,7 @@ class SingletonMeta(type):
 
     @classmethod
     def bind(cls, device, factory):
-        device_id = device['ID_SERIAL_SHORT']
+        device_id = device.id
         with cls._lock:
             if device_id not in cls._drivers:
                 cls._drivers[device_id] = factory(device), 0
@@ -71,7 +71,7 @@ class SingletonMeta(type):
 
     @classmethod
     def unbind(cls, device):
-        device_id = device['ID_SERIAL_SHORT']
+        device_id = device.id
         with cls._lock:
             driver, counter = cls._drivers[device_id]
             counter -= 1
@@ -120,14 +120,18 @@ class Driver(metaclass=SingletonMeta):
     def _open(self):
         self._fptr.open()
         while not self._fptr.isOpened():
-            logger.info('%s занят', self)
+            logger.info('%s busy', self)
             time.sleep(0.1)
             self._fptr.open()
-        logger.info('%s подключен', self)
+        logger.info('%s connected', self)
 
     def _close(self):
         self._fptr.close()
-        logger.info('%s отключен', self)
+        logger.info('%s disconnected', self)
+
+    def reconnect(self):
+        self._close()
+        self._open()
 
     def destroy(self):
         SingletonMeta.unbind(self._device)
@@ -168,4 +172,4 @@ class Driver(metaclass=SingletonMeta):
                                error_msg=msg)
 
     def __repr__(self):
-        return 'Драйвер[%s]' % self._device['ID_SERIAL_SHORT']
+        return 'Драйвер[%s]' % self._device.id

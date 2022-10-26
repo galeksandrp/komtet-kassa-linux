@@ -1,9 +1,10 @@
 import logging
 from threading import Lock
+from dataclasses import dataclass
 
 from pyudev import Context, Monitor, MonitorObserver
 
-from komtet_kassa_linux.driver import Driver
+from .driver import Driver
 from komtet_kassa_linux.models import change_event
 
 
@@ -12,6 +13,19 @@ logger = logging.getLogger(__name__)
 
 ATOL_VENDOR_ID = '2912'
 SUBSYSTEM = 'usb'
+
+@dataclass
+class USBDevice:
+    id: str
+    serial_number: str = None
+    devpath: str = None
+    vendor_id: str = None
+
+@dataclass
+class TCPDevice:
+    id: str
+    serial_number: str = None
+    ip_address: str = None
 
 
 class SingletonMeta(type):
@@ -35,25 +49,55 @@ class DeviceManager(metaclass=SingletonMeta):
 
     def __init__(self):
         self._lock = Lock()
+        self.connect_usb_devices()
 
+    def connect_usb_devices(self):
+        ''' Сканим порты, добавляем в список _devices
+            и ставим observer на подключение / отключение
+        '''
         context = Context()
-        for device in context.list_devices(subsystem=SUBSYSTEM, ID_BUS=SUBSYSTEM,
-                                           ID_VENDOR_ID=ATOL_VENDOR_ID):
-            self._add(dict(device.properties))
+        for device in context.list_devices(subsystem=SUBSYSTEM, ID_BUS=SUBSYSTEM, ID_VENDOR_ID=ATOL_VENDOR_ID):
+
+            self._add(
+                USBDevice(
+                    id=device.properties.get('ID_SERIAL_SHORT'),
+                    devpath=device.properties.get('DEVPATH'),
+                    vendor_id=device.properties.get('ID_VENDOR_ID')
+                )
+            )
 
         monitor = Monitor.from_netlink(context)
         monitor.filter_by(subsystem=SUBSYSTEM)
         self.observer = observer = MonitorObserver(monitor, self.__observer_handler)
         observer.start()
 
+    def connect_tcp_device(self, ip):
+        ''' Устройства по ip подключаем по одному, поднимая из базы
+        '''
+
+        return self._add(
+            TCPDevice(
+                id=ip,
+                ip_address=ip
+            )
+        )
+
     def __del__(self):
         self.observer.stop()
 
     def __observer_handler(self, action, device):
         if action == 'add':
-            self._add(dict(device))
+            self._add(
+                USBDevice(
+                    id=device.properties.get('ID_SERIAL_SHORT'),
+                    devpath=device.properties.get('DEVPATH'),
+                    vendor_id=device.properties.get('ID_VENDOR_ID')
+                )
+            )
         elif action == 'remove':
-            self._remove(dict(device))
+            self._remove_by_devpath(device.properties.get('DEVPATH'))
+
+        change_event.set()
 
     def get(self, serial_number):
         return self._devices.get(serial_number)
@@ -65,10 +109,7 @@ class DeviceManager(metaclass=SingletonMeta):
         return list(self._devices.values())
 
     def _add(self, device):
-        if not ({'DEVPATH', 'ID_SERIAL_SHORT', 'SUBSYSTEM', 'ID_VENDOR_ID'} <= set(device)):
-            return
-
-        if device['ID_VENDOR_ID'] != ATOL_VENDOR_ID:
+        if isinstance(device, USBDevice) and device.vendor_id != ATOL_VENDOR_ID:
             return
 
         with Driver(device) as driver:
@@ -76,28 +117,24 @@ class DeviceManager(metaclass=SingletonMeta):
 
         with self._lock:
             if serial_number not in self._devices:
-                self._devices[serial_number] = {
-                    'SERIAL_NUMBER': serial_number,
-                    'ID_SERIAL_SHORT': device['ID_SERIAL_SHORT'],
-                    'DEVPATH': device['DEVPATH'],
-                    'SUBSYSTEM': device['SUBSYSTEM']
-                }
-                logger.info('Подключение устройства %s к порту %s',
-                            serial_number, device['DEVPATH'])
-                change_event.set()
+                device.serial_number = serial_number
+                self._devices[serial_number] = device
+                logger.info('Connect device %s', serial_number)
 
-    def _remove(self, device):
-        if 'DEVPATH' not in device:
-            return
+        return self._devices[serial_number]
 
+    def remove_by_serial_number(self, serial_number):
+        if self._devices.get(serial_number):
+            del self._devices[serial_number]
+            logger.info('Disconnect device %s', serial_number)
+
+    def _remove_by_devpath(self, devpath):
         with self._lock:
             removed_serial_number = None
-            for serial_number, dev in self._devices.items():
-                if device['DEVPATH'] == dev['DEVPATH']:
+            for serial_number, device in self._devices.items():
+                if isinstance(device, USBDevice) and device.devpath == devpath:
                     removed_serial_number = serial_number
+                    break
 
             if removed_serial_number:
-                del self._devices[removed_serial_number]
-                logger.info('Отключение устройства %s от порта %s',
-                            removed_serial_number, device['DEVPATH'])
-                change_event.set()
+                self.remove_by_serial_number(removed_serial_number)

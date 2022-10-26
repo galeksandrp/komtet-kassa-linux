@@ -1,4 +1,4 @@
-from komtet_kassa_linux.driver import IFptr
+from komtet_kassa_linux.devices.atol.driver import IFptr
 
 
 AGENT_TYPE_MAP = {

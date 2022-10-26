@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from komtet_kassa_linux.driver import IFptr
+from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.models import Printer
 
 

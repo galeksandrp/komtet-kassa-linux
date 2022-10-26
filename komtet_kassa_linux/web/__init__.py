@@ -11,6 +11,7 @@ app = Flask('raspberry_km',
             template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
             static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['is_lease'] = bool(settings.LEASE_STATION)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.secret_key = settings.SECRET_KEY
 
 from komtet_kassa_linux.web import routes  # isort:skip

@@ -1,7 +1,7 @@
 import base64
 from time import sleep
 
-from komtet_kassa_linux.driver import IFptr
+from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.devices.atol import constants as c
 
 COUNT_OISM_VERIFY_TIMES = 5

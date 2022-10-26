@@ -9,9 +9,21 @@
   {% endif %}
 
   <h2>Регистрация принтера</h2>
-  
+
   <div class="row justify-content-center">
     <form method="POST" class="col-4">
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if connection_type == 'usb' else '' }}" href="{{ url_for('registrate_printer', type='usb') }}">USB</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if connection_type == 'tcp' else '' }}" href="{{ url_for('registrate_printer', type='tcp') }}">TCP</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if connection_type == 'virtual' else '' }}" href="{{ url_for('registrate_printer', type='virtual') }}">Виртуальный</a>
+        </li>
+      </ul>
+
       <label class="form-group has-float-label">
         <input id="name" class="form-control" name="name" type="text" required placeholder="КМ1" value="{{request.form.get('name', '')}}">
         <span for="name" class="label">Название</span>
@@ -27,19 +39,28 @@
         <span for="shopSecret" class="label">Секретный ключ кассы</span>
       </label>
 
-      <label class="form-group has-float-label">
-        <select id="device" class="form-control" name="serial_number" type="text" placeholder="123" required>
-          <option value="{{ vprinter_sn }}">Виртуальный принтер</option>
-          {% for serial_number in printers %}
-            <option value="{{ serial_number }}"
-              {% if serial_number == request.form.get('serial_number') %}
-                    selected
-              {% endif %}
-              >{{ serial_number }}</option>
-          {% endfor %}
-        </select>
-        <span for="device" class="label">Принтер</span>
-      </label>
+      {% if connection_type == 'usb' %}
+        <label class="form-group has-float-label">
+          <select id="device" class="form-control" name="serial_number" type="text" placeholder="123" required>
+            <!-- <option value="{{ vprinter_sn }}">Виртуальный принтер</option> -->
+            {% for serial_number in printers %}
+              <option value="{{ serial_number }}"
+                {% if serial_number == request.form.get('serial_number') %}
+                      selected
+                {% endif %}
+                >{{ serial_number }}</option>
+            {% endfor %}
+          </select>
+          <span for="device" class="label">Принтер</span>
+        </label>
+      {% elif connection_type == 'tcp' %}
+        <label class="form-group has-float-label">
+          <input id="ip" class="form-control" name="ip" type="text" required placeholder="192.168.1.55" value="{{request.form.get('ip', '')}}">
+          <span for="ip" class="label">IP адрес</span>
+        </label>
+      {% elif connection_type == 'virtual' %}
+        <input type="hidden" name="serial_number" value="{{ vprinter_sn }}"/>
+      {% endif %}
 
       <button type="submit" class="form-control btn">Активировать</button>
       <a href="{{ url_for('devices') }}" class="form-control btn">Отмена</a>

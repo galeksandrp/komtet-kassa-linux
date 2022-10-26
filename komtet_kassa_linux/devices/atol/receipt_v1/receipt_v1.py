@@ -3,7 +3,7 @@ from time import sleep
 from .. import constants as c
 from komtet_kassa_linux.devices.atol.receipt import set_params, Receipt
 from komtet_kassa_linux.devices.atol.receipt import FFD_1_05, FFD_1_20, STATES_KM_FOR_MEASURABLE_POSITION
-from komtet_kassa_linux.driver import IFptr
+from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.libs.helpers import get_mark_code
 from komtet_kassa_linux.libs import version_helper
 

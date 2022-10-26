@@ -1,6 +1,6 @@
 import logging
 
-from komtet_kassa_linux.driver import IFptr
+from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.libs.memoize import memoize_property
 
 logger = logging.getLogger(__name__)
