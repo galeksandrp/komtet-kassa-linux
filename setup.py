@@ -8,7 +8,7 @@ with open('requirements.txt') as file:
 
 version = 'undefined'
 if os.path.isfile('CHANGELOG.rst'):
-    with open('CHANGELOG.rst', 'r') as file:
+    with open('CHANGELOG.rst', 'r', encoding="utf8") as file:
         for line in file:
             ver = re.match(r'^[0-9]+\.[0-9]+\.[0-9]', line)
             version = ver and ver.group(0)
