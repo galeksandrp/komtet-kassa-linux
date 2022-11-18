@@ -2,7 +2,12 @@ import logging
 from threading import Lock
 from dataclasses import dataclass
 
-from pyudev import Context, Monitor, MonitorObserver
+if True: # utilsGetWinAvailability
+    import os
+    import json
+    from komtet_kassa_linux.gap.pyudev import Context, Monitor, MonitorObserver
+else:
+    from pyudev import Context, Monitor, MonitorObserver
 
 from .driver import Driver
 from komtet_kassa_linux.models import change_event
@@ -83,7 +88,8 @@ class DeviceManager(metaclass=SingletonMeta):
         )
 
     def __del__(self):
-        self.observer.stop()
+        if False: # utilsGetWinAvailability
+            self.observer.stop()
 
     def __observer_handler(self, action, device):
         if action == 'add':
