@@ -2,7 +2,11 @@ import logging
 from threading import Lock
 from dataclasses import dataclass
 
-from pyudev import Context, Monitor, MonitorObserver
+if True: # utilsGetWinAvailability
+    import os
+    import json
+else:
+    from pyudev import Context, Monitor, MonitorObserver
 
 from .driver import Driver
 from komtet_kassa_linux.models import change_event
@@ -55,21 +59,32 @@ class DeviceManager(metaclass=SingletonMeta):
         ''' Сканим порты, добавляем в список _devices
             и ставим observer на подключение / отключение
         '''
-        context = Context()
-        for device in context.list_devices(subsystem=SUBSYSTEM, ID_BUS=SUBSYSTEM, ID_VENDOR_ID=ATOL_VENDOR_ID):
+        if True: # utilsGetWinAvailability
+            with open(os.path.join(os.getcwd(), 'komtet_kassa_linux_devices.json')) as utilsKKLDevices:
+                for utilsKKLDevice in json.load(utilsKKLDevices):
+                    self._add(
+                        USBDevice(
+                            id=utilsKKLDevice.get('ID_SERIAL_SHORT'),
+                            devpath=utilsKKLDevice.get('DEVPATH'),
+                            vendor_id=utilsKKLDevice.get('ID_VENDOR_ID')
+                        )
+                    )
+        else:
+            context = Context()
+            for device in context.list_devices(subsystem=SUBSYSTEM, ID_BUS=SUBSYSTEM, ID_VENDOR_ID=ATOL_VENDOR_ID):
 
-            self._add(
-                USBDevice(
-                    id=device.properties.get('ID_SERIAL_SHORT'),
-                    devpath=device.properties.get('DEVPATH'),
-                    vendor_id=device.properties.get('ID_VENDOR_ID')
+                self._add(
+                    USBDevice(
+                        id=device.properties.get('ID_SERIAL_SHORT'),
+                        devpath=device.properties.get('DEVPATH'),
+                        vendor_id=device.properties.get('ID_VENDOR_ID')
+                    )
                 )
-            )
 
-        monitor = Monitor.from_netlink(context)
-        monitor.filter_by(subsystem=SUBSYSTEM)
-        self.observer = observer = MonitorObserver(monitor, self.__observer_handler)
-        observer.start()
+            monitor = Monitor.from_netlink(context)
+            monitor.filter_by(subsystem=SUBSYSTEM)
+            self.observer = observer = MonitorObserver(monitor, self.__observer_handler)
+            observer.start()
 
     def connect_tcp_device(self, ip):
         ''' Устройства по ip подключаем по одному, поднимая из базы
@@ -83,7 +98,8 @@ class DeviceManager(metaclass=SingletonMeta):
         )
 
     def __del__(self):
-        self.observer.stop()
+        if False: # utilsGetWinAvailability
+            self.observer.stop()
 
     def __observer_handler(self, action, device):
         if action == 'add':
