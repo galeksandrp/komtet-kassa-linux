@@ -11,6 +11,9 @@ from komtet_kassa_linux import settings
 from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.devices.atol.kkt import KKT
 from komtet_kassa_linux.devices.atol.driver import Driver
+if True: # utilsGetWinAvailability
+    import _thread
+    import os
 from komtet_kassa_linux.libs.komtet_kassa import POS
 from komtet_kassa_linux.models import Printer, change_event
 
@@ -122,12 +125,24 @@ def upgrade():
     if True: # utilsGetUpgradeReinstallAvailability
         utilsLatestInfoURL = latest_info['url']
         latest_info['url'] = '--force-reinstall --no-dependencies ' + latest_info['url']
-    subprocess.call(' && '.join([
-        '. env/bin/activate',
-        'pip install -U ' + latest_info['url'],
-        'deactivate',
-        'sudo supervisorctl restart rkm:'
-    ]), shell=True)
+    if True: # utilsGetWinAvailability
+        try:
+            _thread.interrupt_main()
+        finally:
+            os.execvp('cmd', [
+                '/c',
+                ' && '.join(['env\\Scripts\\activate',
+                'pip install -U ' + latest_info['url'],
+                'deactivate',
+                'env\\Scripts\\kklinux'])
+            ])
+    else:
+        subprocess.call(' && '.join([
+            '. env/bin/activate',
+            'pip install -U ' + latest_info['url'],
+            'deactivate',
+            'sudo supervisorctl restart rkm:'
+        ]), shell=True)
     if True: # utilsGetUpgradeReinstallAvailability
         latest_info['url'] = utilsLatestInfoURL
     logger.info('Finish update to %s', latest_info['version'])

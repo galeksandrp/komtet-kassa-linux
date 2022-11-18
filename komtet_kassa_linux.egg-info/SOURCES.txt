@@ -104,6 +104,7 @@ komtet_kassa_linux/devices/atol/receipt_v2/receipt_v2_factory.py
 komtet_kassa_linux/devices/atol/receipt_v2/__pycache__/__init__.cpython-312.pyc
 komtet_kassa_linux/devices/atol/receipt_v2/__pycache__/receipt_v2.cpython-312.pyc
 komtet_kassa_linux/devices/atol/receipt_v2/__pycache__/receipt_v2_factory.cpython-312.pyc
+komtet_kassa_linux/gap/pyudev/__init__.py
 komtet_kassa_linux/km_manager/__init__.py
 komtet_kassa_linux/km_manager/__main__.py
 komtet_kassa_linux/km_manager/km.py
