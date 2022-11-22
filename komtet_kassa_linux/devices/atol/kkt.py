@@ -53,7 +53,7 @@ class KKT:
     @property
     def ffd_version(self):
         with self._driver.query_fn_data(IFptr.LIBFPTR_FNDT_FFD_VERSIONS) as fptr:
-            return _get_param(fptr, IFptr.LIBFPTR_PARAM_FN_FFD_VERSION)
+            return _get_param(fptr, IFptr.LIBFPTR_PARAM_FFD_VERSION)
 
     @property
     def date_time(self):
