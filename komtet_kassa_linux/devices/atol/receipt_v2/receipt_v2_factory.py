@@ -11,6 +11,7 @@ def receipt_v2_factory(driver, ffd_version, task):
         Метод обхода JSON чека v2 структуры
         Результат выполнения - сформированный объект receipt.
     '''
+    utilsPaymentAddressParts = task['company']['payment_address'].split('%')
     receipt = ReceiptV2(driver, ffd_version)
     if True: # getSellAndSellReturnAsCorrectionAvailability
         utilsIntent = task['intent']
@@ -44,6 +45,9 @@ def receipt_v2_factory(driver, ffd_version, task):
                            task['client'].get('document_data'),
                            task['client'].get('address'))
         receipt.client = task['client'].get('email', task['client'].get('phone'))
+    elif True: # getCustomerVATIDFix
+        if '%' in task['company']['payment_address']:
+            receipt.set_client(utilsPaymentAddressParts[1], utilsPaymentAddressParts[2])
     receipt.sno = task['company']['sno']
 
     if task.get('sectoral_check_props'):
@@ -75,7 +79,10 @@ def receipt_v2_factory(driver, ffd_version, task):
             task['correction']['document']
         )
     if True: # getCorrectionChequePaymentAddressAvailability
-        receipt.payment_address = task['company']['payment_address']
+        if '%' in task['company']['payment_address']:
+            receipt.payment_address = utilsPaymentAddressParts[0]
+        else:
+            receipt.payment_address = task['company']['payment_address']
 
     for position in task['positions']:
         agent = supplier = None
