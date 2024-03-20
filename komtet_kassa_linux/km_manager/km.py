@@ -51,9 +51,8 @@ class BaseKM:
         raise NotImplementedError
 
     def beat(self, is_only_send_report=False):
-        if not self.printer.is_virtual:
-            # TODO: вынести в AtolKM
-            Shift(self._driver, self.printer.serial_number).autocheck()
+        # TODO: вынести в AtolKM
+        Shift(self._driver, self.printer.serial_number).autocheck()
 
         device_info = self.get_device_info()
         fiscal_data = None
@@ -188,54 +187,3 @@ class KM(BaseKM):
         report.update(self._kkt.last_receipt)
         report.update(self._kkt.shift_info)
         return report
-
-
-class VirtualKM(BaseKM):
-
-    def get_device_info(self):
-        return {
-            'serial_number': self.printer.serial_number,
-            'rent_station': self.rent_station,
-            'fiscal_id': '0000000000000001',
-            'reg_till': datetime.date.today() + datetime.timedelta(days=10),
-            'fn_state': 0
-        }
-
-    def fiscalize_receipt(self, task):
-        return {
-            'id': task['id'],
-            'inn': (task['company']['inn']
-                    if task['version'] == 'v2'
-                    else task['inn']),
-            'kkt_serial_number': self.printer.serial_number,
-            'kkt_reg_number': '0000000000000001',
-            'fiscal_drive_id': '0000000000000001',
-
-            'ofd_url': 'ofdp.platformaofd.ru',
-
-            'sno': (str(task['company']['sno'])
-                    if task['version'] == 'v2'
-                    else str(task.get('sno'))),
-            'cashier': (task['cashier']['name']
-                        if task['version'] == 'v2'
-                        else task.get('cashier')),
-            'organisation': (task['company']['name']
-                             if task['version'] == 'v2'
-                             else task.get('org_name') or ''),
-            'organisation_address': (task['company']['place_address']
-                                     if task['version'] == 'v2'
-                                     else task.get('org_address') or ''),
-            'fiscal_document_number': '1',
-            'sum': sum([payment['sum'] for payment in task.get("payments")]),
-            'fiscal_id': '0000000001',
-            'time': datetime.datetime.now(),
-            'session_check': '1',
-            'session': '1'
-        }
-
-
-def factory_km(printer, rent_station=None):
-    if printer.is_virtual:
-        return VirtualKM(printer, rent_station=rent_station)
-
-    return KM(printer, rent_station=rent_station)

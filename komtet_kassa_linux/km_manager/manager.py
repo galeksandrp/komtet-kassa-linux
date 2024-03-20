@@ -8,7 +8,7 @@ import psutil
 from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.models import Printer, change_event as change_db_event
 
-from .km import factory_km
+from .km import KM
 
 
 logger = logging.getLogger(__name__)
@@ -61,10 +61,7 @@ class KmManager:
     def start_km(self, printer):
         ''' Запуск одного устройства
         '''
-        if printer.is_virtual:
-            # Запуск виртуальных принтеров
-            pass
-        elif printer.ip:
+        if printer.ip:
             # Запуск принтеров по tcp
             device = self._device_manager.connect_tcp_device(printer.ip)
             printer.serial_number = device.serial_number
@@ -78,7 +75,7 @@ class KmManager:
             logger.warn(f'KM - {printer.serial_number}  was already run')
             self.stop_km(printer.serial_number)
 
-        km = factory_km(printer, rent_station=self._rent_station)
+        km = KM(printer, rent_station=self._rent_station)
         km_thread = self._km_threads[printer.serial_number] = RepeatThread(
             printer.serial_number, km.beat, self._interval
         )
@@ -91,10 +88,10 @@ class KmManager:
         return km_thread
 
     def start(self, is_ingnore_online=False):
-        ''' Запуск всех устройств зарегистрированных в базе
+        """ Запуск всех устройств зарегистрированных в базе
             Поднимаем всех из базы и запускаем
             @is_ingnore_online: игнорировать со статусом is_online. Для запуска при синхронизации.
-        '''
+        """
         for printer in Printer.query.all():
             if printer.is_online and is_ingnore_online:
                 continue
@@ -102,8 +99,8 @@ class KmManager:
             self.start_km(printer)
 
     def stop_km(self, serial_number, is_wait_complete=True):
-        ''' Остановка треда
-        '''
+        """ Остановка треда
+        """
         km_thread = self._km_threads.pop(serial_number, None)
         if km_thread:
             km_thread.stop()
@@ -111,14 +108,15 @@ class KmManager:
                 km_thread.join()
                 logger.info('Stop KM[%s]', serial_number)
 
-        if printer := Printer.query.filter_by(serial_number=serial_number).first():
+        printer = Printer.query.filter_by(serial_number=serial_number).first()
+        if printer:
             printer.update(devname=None, is_online=False)
 
         return km_thread
 
     def stop(self):
-        ''' Остановка всех запущенных тредов
-        '''
+        """ Остановка всех запущенных тредов
+        """
         # Отправка сигнала завершения КМ
         stopped_km_threads = {
             serial_number: self.stop_km(serial_number, is_wait_complete=False)

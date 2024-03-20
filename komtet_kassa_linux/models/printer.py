@@ -1,7 +1,4 @@
 from sqlalchemy import Column, DateTime, String, Boolean
-from sqlalchemy.ext.hybrid import hybrid_property
-
-from komtet_kassa_linux.libs import VIRTUAL_PRINTER_PREFIX
 
 from .meta import BaseModel
 
@@ -15,7 +12,6 @@ class Printer(BaseModel):
     devname = Column(String)
     ip = Column(String)
     is_online = Column(Boolean, default=False)
-    is_virtual = Column(Boolean, default=False)
     session_closed_at = Column(DateTime)
 
     def __eq__(self, other):

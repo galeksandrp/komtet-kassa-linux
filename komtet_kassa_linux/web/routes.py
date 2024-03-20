@@ -11,14 +11,13 @@ from komtet_kassa_linux import settings
 from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.devices.atol.kkt import KKT
 from komtet_kassa_linux.devices.atol.driver import Driver
-from komtet_kassa_linux.libs import VIRTUAL_PRINTER_PREFIX
 from komtet_kassa_linux.libs.htpasswd import HtpasswdFile
 from komtet_kassa_linux.libs.komtet_kassa import POS
 from komtet_kassa_linux.models import Printer, change_event
 
 from . import app
 
-CONNECTION_TYPES = USB, TCP, VIRTUAL = 'usb', 'tcp', 'virtual'
+CONNECTION_TYPES = USB, TCP = 'usb', 'tcp'
 
 
 logger = logging.getLogger(__name__)
@@ -74,17 +73,6 @@ def registrate_printer():
                 logger.info('Add %s', printer)
                 change_event.set()
 
-        elif connection_type == VIRTUAL:
-            try:
-                pos.activate(request.form['serial_number'], settings.LEASE_STATION)
-            except HTTPError as exc:
-                error = exc.response.json()['description']
-                logger.warning('Activation error: %s', error)
-            else:
-                printer = Printer(is_virtual=True, **request.form.to_dict()).save()
-                logger.info('Add %s', printer)
-                change_event.set()
-
         return redirect(url_for('devices'))
 
     actived_devices = Printer.query.all()
@@ -94,7 +82,6 @@ def registrate_printer():
     return render_template('registrate_printer.html',
                            connection_type=connection_type,
                            printers=devices,
-                           vprinter_sn=VIRTUAL_PRINTER_PREFIX + str(int(time.time() * 10000000)),
                            error=error)
 
 

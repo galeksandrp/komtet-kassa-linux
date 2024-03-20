@@ -23,13 +23,13 @@
           <tr>
             <td>
               <a href="{{ url_for('printer_details', printer_number=printer.serial_number) }}">
-                {{ printer.is_virtual and 'Виртуальный принтер' or printer.serial_number }}
+                {{ printer.serial_number }}
               </a>
             </td>
             <td>{{ printer.name }}</td>
             <td>
               <ul class="state">
-                {% if printer.is_virtual or printer.serial_number in connected_devices %}
+                {% if printer.serial_number in connected_devices %}
                   <li class="online"><span>подкл.</span></li>
                 {% else %}
                   <li class="offline"><span>откл.</span></li>
