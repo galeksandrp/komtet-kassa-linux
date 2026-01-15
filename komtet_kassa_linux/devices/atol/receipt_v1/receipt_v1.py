@@ -2,7 +2,7 @@ from time import sleep
 
 from .. import constants as c
 from komtet_kassa_linux.devices.atol.receipt import set_params, Receipt
-from komtet_kassa_linux.devices.atol.receipt import FFD_1_05, FFD_1_20, STATES_KM_FOR_MEASURABLE_POSITION
+from komtet_kassa_linux.devices.atol.receipt import FFD_1_05, FFD_1_20
 from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.libs.helpers import get_mark_code
 from komtet_kassa_linux.libs import version_helper
@@ -123,7 +123,7 @@ class ReceiptV1(Receipt):
         if measurement_unit:
             if version_helper.greater_or_equal(self.ffd_version, FFD_1_20):
                 params[2108] = c.MEASURE_MAP_V1.get(
-                    measurement_unit.lower(),  IFptr.LIBFPTR_IU_PIECE
+                    measurement_unit.lower(), IFptr.LIBFPTR_IU_PIECE
                 )
             elif version_helper.greater_or_equal(self.ffd_version, FFD_1_05):
                 params[1197] = measurement_unit
@@ -152,26 +152,32 @@ class ReceiptV1(Receipt):
         if nomenclature_code:
             if version_helper.greater_or_equal(self.ffd_version, FFD_1_20):
                 mark_code = get_mark_code(nomenclature_code['code_restored'])
-                is_verified, planing_marking_status = self.verify_mark_code(
+
+                if measurement_unit:
+                    measurement_unit = c.MEASURE_MAP_V1.get(
+                        measurement_unit.lower(), IFptr.LIBFPTR_IU_PIECE
+                    )
+
+                    params.update({
+                        IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measurement_unit
+                    })
+
+                validation_result = self.verify_mark_code(
                     mark_code=mark_code,
-                    measure_name=measurement_unit
+                    measure_name=measurement_unit,
+                    quantity=quantity
                 )
 
-                if not is_verified:
+                if not validation_result:
                     raise Exception('Ошибка проверки КМ')
 
                 params.update({
-                    IFptr.LIBFPTR_PARAM_MARKING_CODE_TYPE: IFptr.LIBFPTR_MCT12_AUTO,
                     IFptr.LIBFPTR_PARAM_MARKING_CODE: mark_code,
-                    IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planing_marking_status,
-                    IFptr.LIBFPTR_PARAM_MARKING_PROCESSING_MODE: KKM_MARKING_PROCESSING_MODE
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: IFptr.LIBFPTR_MES_UNCHANGED,
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT: validation_result,
+                    IFptr.LIBFPTR_PARAM_MARKING_PROCESSING_MODE: KKM_MARKING_PROCESSING_MODE,
+                    IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity)
                 })
-
-                if planing_marking_status in STATES_KM_FOR_MEASURABLE_POSITION:
-                    params.update({
-                        IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
-                        IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measurement_unit
-                    })
 
             elif version_helper.greater_or_equal(self.ffd_version, FFD_1_05):
                 params[1162] = bytearray.fromhex(nomenclature_code['hex_code'])

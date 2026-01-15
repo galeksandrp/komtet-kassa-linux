@@ -114,7 +114,8 @@ def receipt_v2_factory(driver, ffd_version, task):
             mark_quantity=position.get('mark_quantity'),
             mark_code=position.get('mark_code'),
             sectoral_item_props=position.get('sectoral_item_props'),
-            wholesale=position.get('wholesale')
+            wholesale=position.get('wholesale'),
+            planned_status=position.get('planned_status')
         )
         base_position_total = float(to_decimal(Decimal(price) * Decimal(quantity)))
         receipt.add_position(price=price, quantity=quantity, total=base_position_total,

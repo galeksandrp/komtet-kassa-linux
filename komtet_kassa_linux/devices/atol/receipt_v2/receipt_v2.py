@@ -1,9 +1,7 @@
 from time import sleep
 
 from .. import constants as c
-from komtet_kassa_linux.devices.atol.receipt import (
-    STATES_KM_FOR_MEASURABLE_POSITION, set_params, Receipt
-)
+from komtet_kassa_linux.devices.atol.receipt import set_params, Receipt
 from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.libs.helpers import get_mark_code, prepare_dict
 
@@ -134,7 +132,7 @@ class ReceiptV2(Receipt):
 
     def add_position(self, name, price, quantity, total, vat, discount=0.0, measurement_unit=None,
                      payment_method=None, payment_object=None, agent=None, supplier=None,
-                     mark_code=None, mark_quantity=None, wholesale=False, **kw):
+                     mark_code=None, mark_quantity=None, wholesale=False, planned_status=None, **kw):
         ''' Добавление параметров для регистрации позиции '''
         params = {
             IFptr.LIBFPTR_PARAM_COMMODITY_NAME: name,
@@ -153,6 +151,9 @@ class ReceiptV2(Receipt):
 
         if payment_method:
             params[1214] = c.PAYMENT_METHOD_MAP[payment_method]
+
+        if measurement_unit:
+            params[2108] = measurement_unit
 
         if agent:
             params.update(dict(agent))
@@ -187,28 +188,29 @@ class ReceiptV2(Receipt):
                     IFptr.LIBFPTR_PARAM_PRODUCT_CODE: mark_code
                  })
             else:
-                is_verified, planing_marking_status = self.verify_mark_code(
+                planned_status = (
+                    c.PLANNED_STATUS_MAP[planned_status] if planned_status else IFptr.LIBFPTR_MES_UNCHANGED
+                )
+
+                validation_result = self.verify_mark_code(
                     mark_code=mark_code,
                     measure_name=measurement_unit,
                     quantity=quantity,
-                    mark_quantity=mark_quantity
+                    mark_quantity=mark_quantity,
+                    planned_status=planned_status
                 )
 
-                if not is_verified:
+                if not validation_result:
                     raise Exception('Ошибка проверки КМ')
 
                 params.update({
-                    IFptr.LIBFPTR_PARAM_MARKING_CODE_TYPE: IFptr.LIBFPTR_MCT12_AUTO,
                     IFptr.LIBFPTR_PARAM_MARKING_CODE: mark_code,
-                    IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planing_marking_status,
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planned_status,
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT: validation_result,
                     IFptr.LIBFPTR_PARAM_MARKING_PROCESSING_MODE: KKM_MARKING_PROCESSING_MODE,
+                    IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
+                    IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measurement_unit
                 })
-
-                if planing_marking_status in STATES_KM_FOR_MEASURABLE_POSITION:
-                    params.update({
-                        IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
-                        IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measurement_unit
-                    })
 
             if mark_quantity:
                 numerator = mark_quantity['numerator']

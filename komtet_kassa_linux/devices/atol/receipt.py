@@ -13,7 +13,6 @@ FFD_FN_VERSIONS_TYPE_MAP = {FFD_UNKNOWN, FFD_1_05, FFD_1_10, FFD_1_20}
 KKM_MARKING_PROCESSING_MODE = 0  # Режим обработки кода товара(необходимо передавать 0)
 MAX_ATTEMPTS_PING_ISM_SERVER = 10
 SUCCESS_CODE_VERIFY = 15
-STATES_KM_FOR_MEASURABLE_POSITION = [IFptr.LIBFPTR_MES_DRY_FOR_SALE, IFptr.LIBFPTR_MES_DRY_RETURN]
 
 
 class Receipt:
@@ -31,38 +30,37 @@ class Receipt:
             if fptr.cancelReceipt():
                 raise self._driver.exception('Ошибка отмены документа')
 
-    def verify_mark_code(self, mark_code, measure_name=IFptr.LIBFPTR_IU_PIECE,
-                         quantity=DEFAULT_QUANTITY, mark_quantity=None):
+    def verify_mark_code(
+        self,
+        mark_code,
+        measure_name=IFptr.LIBFPTR_IU_PIECE,
+        quantity=DEFAULT_QUANTITY,
+        mark_quantity=None,
+        planned_status=IFptr.LIBFPTR_MES_UNCHANGED
+    ):
         '''
-            Метод проверки Кода Маркировки(КМ)
-            входные параметры:
-                1. mark_code - значение КМ;
-                2. measure_name - мера количества товара (тег 2108);
-                3. mark_quantity - значение Дробного количества маркированного товара(1291).
+            Метод проверки Кода Маркировки(КМ).
+            Входные параметры:
+                1. mark_code - код маркировки (тег 2000)
+                2. measure_name - мера количества товара (тег 2108)
+                3. quantity - количество товара (тег 1023)
+                4. mark_quantity - дробное количество товара (тег 1291)
+                5. planned_status - планируемый статус КМ (тег 2003)
         '''
         validation_result = False
         with self._driver.query() as fptr:
-            is_ism_available = self.ping_ism_server(fptr)
-            if not is_ism_available:
+            if not self.ping_ism_server(fptr):
                 raise Exception('Сервер ИСМ недоступен')
 
             params = {
                 IFptr.LIBFPTR_PARAM_MARKING_CODE_TYPE: IFptr.LIBFPTR_MCT12_AUTO,
                 IFptr.LIBFPTR_PARAM_MARKING_CODE: mark_code,
+                IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planned_status,
+                IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
+                IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measure_name,
                 IFptr.LIBFPTR_PARAM_MARKING_WAIT_FOR_VALIDATION_RESULT: True,
                 IFptr.LIBFPTR_PARAM_MARKING_PROCESSING_MODE: KKM_MARKING_PROCESSING_MODE
             }
-
-            planing_marking_status = self.planing_marking_status(mark_quantity)
-            params.update({
-                IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planing_marking_status
-            })
-
-            if planing_marking_status in STATES_KM_FOR_MEASURABLE_POSITION:
-                params.update({
-                    IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
-                    IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measure_name
-                })
 
             if mark_quantity:
                 numerator = mark_quantity['numerator']
@@ -83,9 +81,10 @@ class Receipt:
                 attempts_count += 1
                 sleep(1)
 
-            if fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT) == SUCCESS_CODE_VERIFY:
+            validation_result = fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT)
+
+            if validation_result == SUCCESS_CODE_VERIFY:
                 fptr.acceptMarkingCode()
-                validation_result = True
             else:
                 error_code = fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR)
                 error_description = c.MARKING_CODE_ONLINE_VALIDATION_DESCRIPTION_MAP.get(error_code)
@@ -95,22 +94,7 @@ class Receipt:
 
                 raise Exception(error_description)
 
-        return validation_result, planing_marking_status
-
-    def planing_marking_status(self, mark_quantity):
-        ''' Метод получения планируемого статуса КМ '''
-        planing_mark_status = IFptr.LIBFPTR_MES_UNCHANGED  # статус товара не изменился
-
-        if self.intent == c.RECEIPT_TYPE_MAP['sell'] or self.intent == c.RECEIPT_TYPE_MAP['buy']:
-            planing_mark_status = (IFptr.LIBFPTR_MES_DRY_FOR_SALE
-                                   if mark_quantity else IFptr.LIBFPTR_MES_PIECE_SOLD)
-
-        elif (self.intent == c.RECEIPT_TYPE_MAP['sellReturn'] or
-              self.intent == c.RECEIPT_TYPE_MAP['buyReturn']):
-            planing_mark_status = (IFptr.LIBFPTR_MES_DRY_RETURN
-                                   if mark_quantity else IFptr.LIBFPTR_MES_PIECE_RETURN)
-
-        return planing_mark_status
+        return validation_result
 
     def ping_ism_server(self, fptr):
         '''
