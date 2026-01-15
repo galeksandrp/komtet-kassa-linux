@@ -55,9 +55,11 @@ class ReceiptV1(Receipt):
     def payment_address(self, val):
         self.params[1187] = val
 
-    def set_cashier(self, name, inn):
+    def set_cashier(self, name, inn=None):
         self.cashier[1021] = name
-        self.cashier[1203] = inn
+
+        if inn:
+            self.cashier[1203] = inn
 
     def set_client(self, inn=None, name=None):
         '''
