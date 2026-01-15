@@ -423,10 +423,15 @@ class IFptr(object):
         LIBFPTR_PARAM_LICENSE_INDEX,
         LIBFPTR_PARAM_IS_LICENSE_VALID,
         LIBFPTR_PARAM_RECEIPT_PERCENTAGE_SIZE,
+        LIBFPTR_PARAM_ADDITIONAL_ATTRIBUTE,
+        LIBFPTR_PARAM_ADDITIONAL_DATA,
+        LIBFPTR_PARAM_ELECTRONICALLY_PAYMENT_METHOD,
+        LIBFPTR_PARAM_ELECTRONICALLY_ID,
+        LIBFPTR_PARAM_ELECTRONICALLY_ADD_INFO,
         LIBFPTR_PARAM_LAST_SUCCESS_FNM_UPDATE_KEYS_DATE_TIME,
         LIBFPTR_PARAM_LAST_ATTEMPTION_FNM_UPDATE_KEYS_DATE_TIME,
         LIBFPTR_PARAM_COUNT_ATTEMPTION_FNM_UPDATE_KEYS,
-    ) = RANGE(65536, 65939)
+    ) = RANGE(65536, 65944)
 
     (
         LIBFPTR_OK,
@@ -888,7 +893,8 @@ class IFptr(object):
         LIBFPTR_PT_8,
         LIBFPTR_PT_9,
         LIBFPTR_PT_10,
-    ) = RANGE(0, 10)
+        LIBFPTR_PT_ADD_INFO,
+    ) = RANGE(0, 11)
 
     (
         LIBFPTR_TAX_DEPARTMENT,
@@ -1154,7 +1160,9 @@ class IFptr(object):
         LIBFPTR_MES_DRY_FOR_SALE,
         LIBFPTR_MES_PIECE_RETURN,
         LIBFPTR_MES_DRY_RETURN,
-    ) = RANGE(1, 5)
+        LIBFPTR_MES_PIECE_FOR_SALE,
+        LIBFPTR_MES_DRY_SOLD,
+    ) = RANGE(1, 7)
 
     (
         LIBFPTR_MCS_BLOCK,
@@ -1265,6 +1273,21 @@ class IFptr(object):
     ) = RANGE(0, 19)
 
     (
+        LIBFPTR_TIME_ZONE_DEVICE,
+        LIBFPTR_TIME_ZONE_1,
+        LIBFPTR_TIME_ZONE_2,
+        LIBFPTR_TIME_ZONE_3,
+        LIBFPTR_TIME_ZONE_4,
+        LIBFPTR_TIME_ZONE_5,
+        LIBFPTR_TIME_ZONE_6,
+        LIBFPTR_TIME_ZONE_7,
+        LIBFPTR_TIME_ZONE_8,
+        LIBFPTR_TIME_ZONE_9,
+        LIBFPTR_TIME_ZONE_10,
+        LIBFPTR_TIME_ZONE_11,
+    ) = RANGE(0, 12)
+
+    (
         LIBFPTR_ERROR_BASE_RPC,
         LIBFPTR_ERROR_RCP_SERVER_BUSY,
         LIBFPTR_ERROR_RCP_SERVER_VERSION,
@@ -1341,6 +1364,10 @@ class IFptr(object):
 
     LIBFPTR_SETTING_MERGE_RECEIPT_ITEMS = "MergeReceiptItems"
 
+    LIBFPTR_SETTING_TIME_ZONE = "TimeZone"
+
+    LIBFPTR_SETTING_REMOTE_TIMEOUT = "RemoteTimeout"
+
     LIBFPTR_MODEL_UNKNOWN = 0
 
     LIBFPTR_MODEL_ATOL_25F = 57
@@ -1404,6 +1431,8 @@ class IFptr(object):
     LIBFPTR_MODEL_ATOL_STB_6F = 92
 
     LIBFPTR_MODEL_ATOL_35F = 97
+
+    LIBFPTR_MODEL_ATOL_2F = 96
 
     LIBFPTR_PORT_BR_1200 = 1200
 
@@ -1861,7 +1890,7 @@ class IFptr(object):
         return self._getVersion()
 
     def wrapperVersion(self):
-        return "10.10.6.0"
+        return "10.10.7.0"
 
     def logWrite(self, tag, level, message):
         return self._logWrite(self.interface, tag, level, message)
@@ -1932,9 +1961,12 @@ class IFptr(object):
         if isinstance(param, bool):
             self._setBool(self.interface, ctypes.c_int(paramId), ctypes.c_int(param))
         elif isinstance(param, int) or (sys.version_info < (3, 0) and isinstance(param, long)):
-            if param < 0 or param > 4294967295:
+            if param > 4294967295:
                 raise ValueError("Invalid 'param' value {0}".format(param))
-            self._setInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
+            if param < 0:
+                self._setDouble(self.interface, ctypes.c_int(paramId), ctypes.c_double(param))
+            else:
+                self._setInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
         elif isinstance(param, float):
             self._setDouble(self.interface, ctypes.c_int(paramId), ctypes.c_double(param))
         elif isinstance(param, TEXT):
@@ -1954,9 +1986,12 @@ class IFptr(object):
         if isinstance(param, bool):
             self._setUserBool(self.interface, ctypes.c_int(paramId), ctypes.c_int(param))
         elif isinstance(param, int):
-            if param < 0 or param > 4294967295:
+            if param > 4294967295:
                 raise ValueError("Invalid 'param' value {0}".format(param))
-            self._setUserInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
+            if param < 0:
+                self._setDouble(self.interface, ctypes.c_int(paramId), ctypes.c_double(param))
+            else:
+                self._setInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
         elif isinstance(param, float):
             self._setUserDouble(self.interface, ctypes.c_int(paramId), ctypes.c_double(param))
         elif isinstance(param, TEXT):
@@ -1976,9 +2011,12 @@ class IFptr(object):
         if isinstance(param, bool):
             self._setNonPrintableBool(self.interface, ctypes.c_int(paramId), ctypes.c_int(param))
         elif isinstance(param, int):
-            if param < 0 or param > 4294967295:
+            if param > 4294967295:
                 raise ValueError("Invalid 'param' value {0}".format(param))
-            self._setNonPrintableInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
+            if param < 0:
+                self._setDouble(self.interface, ctypes.c_int(paramId), ctypes.c_double(param))
+            else:
+                self._setInt(self.interface, ctypes.c_int(paramId), ctypes.c_uint(param))
         elif isinstance(param, float):
             self._setNonPrintableDouble(self.interface, ctypes.c_int(paramId), ctypes.c_double(param))
         elif isinstance(param, TEXT):
