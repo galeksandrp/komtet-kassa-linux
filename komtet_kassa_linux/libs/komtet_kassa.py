@@ -58,7 +58,7 @@ class POS:
         response = self._request('/tasks?limit=%s' % limit, {
             'printer': printer_report,
             'check': check_report,
-            'version': 'kkl-' + komtet_kassa_linux.__version__
+            'version': 'linux-' + komtet_kassa_linux.__version__
         })
         checks = response and response.get('checks')
         return checks and checks[0] or None

@@ -89,7 +89,7 @@ class Receipt:
             else:
                 error_code = fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR)
                 error_description = c.MARKING_CODE_ONLINE_VALIDATION_DESCRIPTION_MAP.get(error_code)
-                
+
                 fptr.cancelMarkingCodeValidation()  # Прерывание проверки КМ
                 fptr.clearMarkingCodeValidationResult()  # Очистка таблицы проверенных КМ
 

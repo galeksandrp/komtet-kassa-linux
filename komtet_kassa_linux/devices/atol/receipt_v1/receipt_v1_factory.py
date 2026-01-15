@@ -25,6 +25,9 @@ def receipt_v1_factory(driver, ffd_version, task):
     if task.get('user'):
         receipt.email = task['user']
 
+    if task.get('internet'):
+        receipt.internet = task['internet']
+
     if task.get('additional_user_props'):
         receipt.set_additional_user_props(task['additional_user_props']['name'],
                                           task['additional_user_props']['value'])
@@ -34,9 +37,9 @@ def receipt_v1_factory(driver, ffd_version, task):
 
     if 'correction' in task:
         receipt.set_correction_info(
-            task['correction']['type'],
-            datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
-            task['correction']['document']
+            type=task['correction']['type'],
+            date=datetime.datetime.strptime(task['correction']['date'], "%Y-%m-%d"),
+            document=task['correction'].get('document')
         )
     else:
         receipt.payment_address = task.get('payment_address')
@@ -105,5 +108,14 @@ def receipt_v1_factory(driver, ffd_version, task):
 
     for payment in task['payments']:
         receipt.add_payment(payment['sum'], payment['type'])
+
+    if task.get('cashless_payments'):
+        for cashless_payment in task['cashless_payments']:
+            receipt.add_cashless_payment(
+                _sum=cashless_payment['sum'],
+                method=cashless_payment['method'],
+                _id=cashless_payment['id'],
+                additional_info=cashless_payment.get('additional_info')
+            )
 
     return receipt

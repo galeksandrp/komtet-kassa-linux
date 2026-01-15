@@ -11,6 +11,16 @@ AGENT_TYPE_MAP = {
     'agent': IFptr.LIBFPTR_AT_ANOTHER
 }
 
+PLANNED_STATUS_MAP = {
+    1: IFptr.LIBFPTR_MES_PIECE_SOLD,
+    2: IFptr.LIBFPTR_MES_DRY_FOR_SALE,
+    3: IFptr.LIBFPTR_MES_PIECE_RETURN,
+    4: IFptr.LIBFPTR_MES_DRY_RETURN,
+    5: IFptr.LIBFPTR_MES_PIECE_FOR_SALE,
+    6: IFptr.LIBFPTR_MES_DRY_SOLD,
+    255: IFptr.LIBFPTR_MES_UNCHANGED
+}
+
 SNO_MAP = {
     0: IFptr.LIBFPTR_TT_OSN,
     1: IFptr.LIBFPTR_TT_USN_INCOME,
@@ -33,7 +43,8 @@ RECEIPT_TYPE_MAP = {
 
 CORRECTION_RECEIPT_BASIS_MAP = {
     'self': 0,
-    'forced': 1
+    'forced': 1,
+    'instruction': 1
 }
 
 TAX_MAP = {

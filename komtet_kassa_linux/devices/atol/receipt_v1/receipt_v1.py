@@ -20,6 +20,7 @@ class ReceiptV1(Receipt):
         self.params = {}
         self.positions = []
         self.payments = []
+        self.cashless_payments = []
         self.cashier = {}
 
     @property
@@ -37,6 +38,14 @@ class ReceiptV1(Receipt):
     @email.setter
     def email(self, val):
         self.params[1008] = val
+
+    @property
+    def internet(self):
+        return self.params[1125]
+
+    @internet.setter
+    def internet(self, val):
+        self.params[1125] = val
 
     @property
     def payment_address(self):
@@ -80,13 +89,19 @@ class ReceiptV1(Receipt):
         ''' Добавление дополнительного реквизита чека '''
         self.params[1192] = value
 
-    def set_correction_info(self, type, date, document):
+    def set_correction_info(self, type, date, document=None):
         ''' Добавление сведений для чека коррекции '''
         self.params[1173] = c.CORRECTION_RECEIPT_BASIS_MAP[type]
-        self.params[1174] = {
-            1178: date,
-            1179: document
-        }
+
+        if document:
+            self.params[1174] = {
+                1178: date,
+                1179: document
+            }
+        else:
+            self.params[1174] = {
+                1178: date
+            }
 
     def add_position(self, name, price, quantity, total, vat, measurement_unit=None,
                      payment_method=None, payment_object=None, agent=None, supplier=None,
@@ -170,6 +185,25 @@ class ReceiptV1(Receipt):
             IFptr.LIBFPTR_PARAM_PAYMENT_SUM: sum
         })
 
+    def add_cashless_payment(self, _sum, method, _id, additional_info=None):
+        if additional_info:
+            self.cashless_payments.append(
+                {
+                    IFptr.LIBFPTR_PARAM_PAYMENT_SUM: _sum,
+                    IFptr.LIBFPTR_PARAM_ELECTRONICALLY_PAYMENT_METHOD: method,
+                    IFptr.LIBFPTR_PARAM_ELECTRONICALLY_ID: _id,
+                    IFptr.LIBFPTR_PARAM_ELECTRONICALLY_ADD_INFO: additional_info
+                }
+            )
+        else:
+            self.cashless_payments.append(
+                {
+                    IFptr.LIBFPTR_PARAM_PAYMENT_SUM: _sum,
+                    IFptr.LIBFPTR_PARAM_ELECTRONICALLY_PAYMENT_METHOD: method,
+                    IFptr.LIBFPTR_PARAM_ELECTRONICALLY_ID: _id
+                }
+            )
+
     def fiscalize(self, is_print=True):
         '''
             Фискализация чека
@@ -204,6 +238,17 @@ class ReceiptV1(Receipt):
                 set_params(fptr, payment)
                 if fptr.payment():
                     raise self._driver.exception('Ошибка регистрации платежа')
+
+            for cashless_payment in self.cashless_payments:
+                fptr.setParam(
+                    IFptr.LIBFPTR_PARAM_PAYMENT_TYPE,
+                    IFptr.LIBFPTR_PT_ADD_INFO
+                )
+
+                set_params(fptr, cashless_payment)
+
+                if fptr.payment():
+                    raise self._driver.exception('Ошибка регистрации сведений об оплате безналичными')
 
             # Перед закрытием проверяем, что все КМ отправились
             while True:
