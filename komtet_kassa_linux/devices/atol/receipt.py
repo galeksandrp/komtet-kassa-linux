@@ -1,4 +1,3 @@
-import base64
 from time import sleep
 
 from komtet_kassa_linux.devices.atol.driver import IFptr
@@ -12,6 +11,7 @@ FFD_1_10 = '110'
 FFD_1_20 = '120'
 FFD_FN_VERSIONS_TYPE_MAP = {FFD_UNKNOWN, FFD_1_05, FFD_1_10, FFD_1_20}
 KKM_MARKING_PROCESSING_MODE = 0  # Режим обработки кода товара(необходимо передавать 0)
+MAX_ATTEMPTS_PING_ISM_SERVER = 10
 SUCCESS_CODE_VERIFY = 15
 STATES_KM_FOR_MEASURABLE_POSITION = [IFptr.LIBFPTR_MES_DRY_FOR_SALE, IFptr.LIBFPTR_MES_DRY_RETURN]
 
@@ -42,9 +42,6 @@ class Receipt:
         '''
         validation_result = False
         with self._driver.query() as fptr:
-            fptr.cancelMarkingCodeValidation()  # Прерывание проверки КМ
-            fptr.clearMarkingCodeValidationResult()  # Очистка таблицы проверенных КМ
-
             is_ism_available = self.ping_ism_server(fptr)
             if not is_ism_available:
                 raise Exception('Сервер ИСМ недоступен')
@@ -89,10 +86,13 @@ class Receipt:
             if fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT) == SUCCESS_CODE_VERIFY:
                 fptr.acceptMarkingCode()
                 validation_result = True
-            elif fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR):
-                error_description = fptr.getParamString(
-                    IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR_DESCRIPTION
-                )
+            else:
+                error_code = fptr.getParamInt(IFptr.LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR)
+                error_description = c.MARKING_CODE_ONLINE_VALIDATION_DESCRIPTION_MAP.get(error_code)
+                
+                fptr.cancelMarkingCodeValidation()  # Прерывание проверки КМ
+                fptr.clearMarkingCodeValidationResult()  # Очистка таблицы проверенных КМ
+
                 raise Exception(error_description)
 
         return validation_result, planing_marking_status
@@ -118,11 +118,15 @@ class Receipt:
         '''
         # Начать проверку связи с сервером ИСМ
         fptr.pingMarkingServer()
-        while True:
+        attempts = 0
+        while attempts < MAX_ATTEMPTS_PING_ISM_SERVER:
             fptr.getMarkingServerStatus()
             if fptr.getParamBool(IFptr.LIBFPTR_PARAM_CHECK_MARKING_SERVER_READY):
                 return True
             sleep(1)
+            attempts += 1
+
+        raise Exception("Не удалось установить связь с сервером ИСМ")
 
 
 class Agent:
