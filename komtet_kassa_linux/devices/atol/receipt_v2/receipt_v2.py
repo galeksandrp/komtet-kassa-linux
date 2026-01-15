@@ -1,11 +1,11 @@
 from time import sleep
 
 from .. import constants as c
-from komtet_kassa_linux.devices.atol.receipt import set_params, Receipt
-from komtet_kassa_linux.devices.atol.receipt import FFD_1_05, FFD_1_20, STATES_KM_FOR_MEASURABLE_POSITION
+from komtet_kassa_linux.devices.atol.receipt import (
+    STATES_KM_FOR_MEASURABLE_POSITION, set_params, Receipt
+)
 from komtet_kassa_linux.devices.atol.driver import IFptr
 from komtet_kassa_linux.libs.helpers import get_mark_code, prepare_dict
-from komtet_kassa_linux.libs import version_helper
 
 from ..receipt import KKM_MARKING_PROCESSING_MODE
 
@@ -119,7 +119,7 @@ class ReceiptV2(Receipt):
 
     def add_position(self, name, price, quantity, total, vat, discount=0.0, measurement_unit=None,
                      payment_method=None, payment_object=None, agent=None, supplier=None,
-                     mark_code=None, mark_quantity=None, **kw):
+                     mark_code=None, mark_quantity=None, wholesale=False, **kw):
         ''' Добавление параметров для регистрации позиции '''
         params = {
             IFptr.LIBFPTR_PARAM_COMMODITY_NAME: name,
@@ -163,31 +163,37 @@ class ReceiptV2(Receipt):
                     1265: sectoral_item['value']
                 }
         if mark_code:
-            type_mark_code = [*mark_code][0]
-            mark_code = get_mark_code(mark_code[type_mark_code])
+            mark_code_type = [*mark_code][0]
+            mark_code = get_mark_code(mark_code[mark_code_type])
 
-            is_verified, planing_marking_status = self.verify_mark_code(
-                mark_code=mark_code,
-                measure_name=measurement_unit,
-                quantity=quantity,
-                mark_quantity=mark_quantity
-            )
+            if wholesale:
+                 params.update({
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_TYPE: IFptr.LIBFPTR_MCT12_AUTO,
+                    IFptr.LIBFPTR_PARAM_PRODUCT_CODE: mark_code
+                 })
+            else:
+                is_verified, planing_marking_status = self.verify_mark_code(
+                    mark_code=mark_code,
+                    measure_name=measurement_unit,
+                    quantity=quantity,
+                    mark_quantity=mark_quantity
+                )
 
-            if not is_verified:
-                raise Exception('Ошибка проверки КМ')
+                if not is_verified:
+                    raise Exception('Ошибка проверки КМ')
 
-            params.update({
-                IFptr.LIBFPTR_PARAM_MARKING_CODE_TYPE: IFptr.LIBFPTR_MCT12_AUTO,
-                IFptr.LIBFPTR_PARAM_MARKING_CODE: mark_code,
-                IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planing_marking_status,
-                IFptr.LIBFPTR_PARAM_MARKING_PROCESSING_MODE: KKM_MARKING_PROCESSING_MODE,
-            })
-
-            if planing_marking_status in STATES_KM_FOR_MEASURABLE_POSITION:
                 params.update({
-                    IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
-                    IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measurement_unit
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_TYPE: IFptr.LIBFPTR_MCT12_AUTO,
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE: mark_code,
+                    IFptr.LIBFPTR_PARAM_MARKING_CODE_STATUS: planing_marking_status,
+                    IFptr.LIBFPTR_PARAM_MARKING_PROCESSING_MODE: KKM_MARKING_PROCESSING_MODE,
                 })
+
+                if planing_marking_status in STATES_KM_FOR_MEASURABLE_POSITION:
+                    params.update({
+                        IFptr.LIBFPTR_PARAM_QUANTITY: float(quantity),
+                        IFptr.LIBFPTR_PARAM_MEASUREMENT_UNIT: measurement_unit
+                    })
 
             if mark_quantity:
                 numerator = mark_quantity['numerator']

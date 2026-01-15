@@ -14,7 +14,7 @@ def receipt_v1_factory(driver, ffd_version, task):
     receipt = ReceiptV1(driver, ffd_version)
     receipt.set_intent(task['intent'])
 
-    if task['cashier'] and task['cashier_inn']:
+    if task['cashier']:
         receipt.set_cashier(task['cashier'], task['cashier_inn'])
 
     if task.get('client'):
