@@ -1,6 +1,6 @@
-alembic==1.4.2
+alembic==1.8.0
 certifi==2020.12.5
-chardet==3.0.4
+chardet==4.0.0
 click==7.1.2
 Flask==2.0.3
 idna==2.10
@@ -12,10 +12,11 @@ psutil==5.9.0
 python-dateutil==2.8.1
 python-editor==1.0.4
 pytest-mock==3.7.0
-pyudev==0.23.2
+pyudev==0.24.0
 raven==6.10.0
 requests==2.27.1
 six==1.15.0
-SQLAlchemy==1.4.35
+SQLAlchemy==1.4.36
 urllib3==1.26.9
 Werkzeug==2.1.1
+setuptools>=40.8.0

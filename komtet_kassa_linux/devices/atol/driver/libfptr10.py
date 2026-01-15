@@ -428,10 +428,17 @@ class IFptr(object):
         LIBFPTR_PARAM_ELECTRONICALLY_PAYMENT_METHOD,
         LIBFPTR_PARAM_ELECTRONICALLY_ID,
         LIBFPTR_PARAM_ELECTRONICALLY_ADD_INFO,
+        LIBFPTR_PARAM_PRINTER_DRIVER_NAME,
+        LIBFPTR_PARAM_SCRIPT_NUMBER,
+        LIBFPTR_PARAM_SCRIPT_EMBEDDED,
+        LIBFPTR_PARAM_OVERWRITE,
+    ) = RANGE(65536, 65945)
+
+    (
         LIBFPTR_PARAM_LAST_SUCCESS_FNM_UPDATE_KEYS_DATE_TIME,
         LIBFPTR_PARAM_LAST_ATTEMPTION_FNM_UPDATE_KEYS_DATE_TIME,
         LIBFPTR_PARAM_COUNT_ATTEMPTION_FNM_UPDATE_KEYS,
-    ) = RANGE(65536, 65944)
+    ) = RANGE(66436, 66439)
 
     (
         LIBFPTR_OK,
@@ -880,7 +887,8 @@ class IFptr(object):
         LIBFPTR_RT_JOURNAL_DOCUMENT_BY_NUMBERS,
         LIBFPTR_RT_JOURNAL_DOCUMENT_BY_SHIFTS,
         LIBFPTR_RT_CLOSE_SHIFT_REPORTS,
-    ) = RANGE(0, 24)
+        LIBFPTR_RT_CLICHE_PICTURES,
+    ) = RANGE(0, 25)
 
     (
         LIBFPTR_PT_CASH,
@@ -910,8 +918,10 @@ class IFptr(object):
         LIBFPTR_TAX_VAT7,
         LIBFPTR_TAX_VAT105,
         LIBFPTR_TAX_VAT107,
+        LIBFPTR_TAX_VAT22,
+        LIBFPTR_TAX_VAT122,
         LIBFPTR_TAX_INVALID,
-    ) = RANGE(0, 14)
+    ) = RANGE(0, 16)
 
     (
         LIBFPTR_EXTERNAL_DEVICE_DISPLAY,
@@ -1050,7 +1060,8 @@ class IFptr(object):
         LIBFPTR_RT_FN_UNSENT_DOCS_COUNTERS,
         LIBFPTR_RT_SETTINGS,
         LIBFPTR_RT_RUN_COMMAND,
-    ) = RANGE(0, 12)
+        LIBFPTR_RT_SCRIPTS_INFO,
+    ) = RANGE(0, 13)
 
     (
         LIBFPTR_LOG_ERROR,
@@ -1367,6 +1378,8 @@ class IFptr(object):
     LIBFPTR_SETTING_TIME_ZONE = "TimeZone"
 
     LIBFPTR_SETTING_REMOTE_TIMEOUT = "RemoteTimeout"
+
+    LIBFPTR_SETTING_USE_COMMODITY_NAME_FOR_ADVANCE = "UseCommodityNameForAdvance"
 
     LIBFPTR_MODEL_UNKNOWN = 0
 
@@ -1890,7 +1903,7 @@ class IFptr(object):
         return self._getVersion()
 
     def wrapperVersion(self):
-        return "10.10.7.0"
+        return "10.10.8.0"
 
     def logWrite(self, tag, level, message):
         return self._logWrite(self.interface, tag, level, message)

@@ -11,7 +11,6 @@ from komtet_kassa_linux import settings
 from komtet_kassa_linux.devices.atol import DeviceManager
 from komtet_kassa_linux.devices.atol.kkt import KKT
 from komtet_kassa_linux.devices.atol.driver import Driver
-from komtet_kassa_linux.libs.htpasswd import HtpasswdFile
 from komtet_kassa_linux.libs.komtet_kassa import POS
 from komtet_kassa_linux.models import Printer, change_event
 
@@ -100,17 +99,6 @@ def deactivate_printer(printer_number):
         logger.info('Remove %s', printer)
 
     return redirect(url_for('devices'))
-
-
-@app.route('/security', methods=['GET', 'POST'])
-def security():
-    if request.method == 'POST':
-        ht = HtpasswdFile('.htpasswd')
-        ht.update('admin', request.form['password'])
-        ht.save()
-        return redirect(url_for('devices'))
-
-    return render_template('security.html')
 
 
 @app.route('/logout')

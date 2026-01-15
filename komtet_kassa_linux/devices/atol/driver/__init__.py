@@ -12,17 +12,40 @@ logger = logging.getLogger(__name__)
 
 
 DRIVER_PLATFORM_DIRECTORY_MAP = {
+    'armv5l': 'linux-armhf',
+    'armv6l': 'linux-armhf',
     'armv7l': 'linux-armhf',
+    'armv8l': 'linux-armhf',
+    'i386': 'linux-x86',
+    'i486': 'linux-x86',
+    'i586': 'linux-x86',
+    'i686': 'linux-x86',
     'x86_64': 'linux-x64',
-    '64bit': 'linux-x64',
-    'aarch64': 'linux-x64'
+    'amd64': 'linux-x64'
 }
-LIBRARY_PATH = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(IFptr))),
-                            DRIVER_PLATFORM_DIRECTORY_MAP.get(platform.machine(), 'linux-armhf'))
 
+def get_library_path():
+    platform_type = platform.machine()
+    platform_bits, _ = platform.architecture()
+    platform_path = ''
+
+    if platform_type in ('aarch64', 'arm64'):
+        platform_path = 'linux-arm64' if platform_bits == '64bit' else 'linux-armhf'
+    elif platform_type.startswith('arm'):
+        platform_path = 'linux-armhf'
+    else:
+        platform_path = DRIVER_PLATFORM_DIRECTORY_MAP.get(platform_type, 'linux-armhf')
+    
+    return os.path.join(
+        os.path.dirname(
+            os.path.abspath(inspect.getfile(IFptr))
+        ), 
+        platform_path
+    )
+
+LIBRARY_PATH = get_library_path()
 
 ERROR_DENIED_IN_CLOSED_RECEIPT = IFptr.LIBFPTR_ERROR_DENIED_IN_CLOSED_RECEIPT
-
 
 def factory_driver(device):
     fptr = IFptr(os.path.join(LIBRARY_PATH, "libfptr10.so"))

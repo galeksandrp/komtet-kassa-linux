@@ -1,5 +1,4 @@
 import os
-from crypt import crypt
 from random import choice
 from string import ascii_letters, digits
 
@@ -35,16 +34,6 @@ class HtpasswdFile:
         """Write the htpasswd file to disk"""
         open(self.filename, 'w').writelines(["%s:%s\n" % (entry[0], entry[1])
                                              for entry in self.entries])
-
-    def update(self, username, password):
-        """Replace the entry for the given user, or add it if new."""
-        pwhash = crypt(password, salt())
-        matching_entries = [entry for entry in self.entries
-                            if entry[0] == username]
-        if matching_entries:
-            matching_entries[0][1] = pwhash
-        else:
-            self.entries.append([username, pwhash])
 
     def delete(self, username):
         """Remove the entry for the given user."""
