@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 DRIVER_PLATFORM_DIRECTORY_MAP = {
     'armv7l': 'linux-armhf',
     'x86_64': 'linux-x64',
-    '64bit': 'linux-x64'
+    '64bit': 'linux-x64',
+    'aarch64': 'linux-x64'
 }
 LIBRARY_PATH = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(IFptr))),
                             DRIVER_PLATFORM_DIRECTORY_MAP.get(platform.machine(), 'linux-armhf'))
