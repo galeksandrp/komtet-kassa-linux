@@ -50,9 +50,6 @@ komtet_kassa_linux/devices/atol/driver/linux-x64/libQt5DBus.so.5
 komtet_kassa_linux/devices/atol/driver/linux-x64/libQt5Gui.so.5
 komtet_kassa_linux/devices/atol/driver/linux-x64/libQt5Network.so.5
 komtet_kassa_linux/devices/atol/driver/linux-x64/libQt5Widgets.so.5
-komtet_kassa_linux/devices/atol/driver/linux-x64/libQtCore.so.4
-komtet_kassa_linux/devices/atol/driver/linux-x64/libQtGui.so.4
-komtet_kassa_linux/devices/atol/driver/linux-x64/libQtNetwork.so.4
 komtet_kassa_linux/devices/atol/driver/linux-x64/libfptr10.so
 komtet_kassa_linux/devices/atol/driver/linux-x64/libfptr10_gui.so
 komtet_kassa_linux/devices/atol/driver/linux-x64/libicudata.so.52

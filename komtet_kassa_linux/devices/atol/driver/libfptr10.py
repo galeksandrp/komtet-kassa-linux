@@ -376,7 +376,7 @@ class IFptr(object):
         LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_RESULT,
         LIBFPTR_PARAM_MARKING_CODE_ONLINE_VALIDATION_ERROR_DESCRIPTION,
         LIBFPTR_PARAM_FN_CONTAINS_KEYS_UPDATER_SERVER_URI,
-        LIBFPTR_PARAM_MARKING_CODE_CLEAR,
+        LIBFPTR_PARAM_CLEAR_MARKING_TABLE,
         LIBFPTR_PARAM_MODULE_ADDRESS,
         LIBFPTR_PARAM_SEGMENT_ADDRESS,
         LIBFPTR_PARAM_LAST_SUCCESSFUL_OKP,
@@ -384,11 +384,49 @@ class IFptr(object):
         LIBFPTR_PARAM_ECR_REGISTRATION_NUMBER,
         LIBFPTR_PARAM_OFD_VATIN,
         LIBFPTR_PARAM_FNS_URL,
+        LIBFPTR_PARAM_MACHINE_NUMBER,
         LIBFPTR_PARAM_MARKING_PRODUCT_ID,
         LIBFPTR_PARAM_TIMEOUT,
         LIBFPTR_PARAM_PRINT_UPDATE_FNM_KEYS_REPORT,
         LIBFPTR_PARAM_FN_KEYS_UPDATER_SERVER_URI,
-    ) = RANGE(65536, 65901)
+        LIBFPTR_PARAM_DOCUMENT_ELECTRONICALLY,
+        LIBFPTR_PARAM_FORMAT_TEXT,
+        LIBFPTR_PARAM_RECEIPT_SIZE,
+        LIBFPTR_PARAM_MARK_SIZE,
+        LIBFPTR_PARAM_MCU_TEMPERATURE,
+        LIBFPTR_PARAM_DATA_FOR_SEND_IS_EMPTY,
+        LIBFPTR_PARAM_AVAILABLE_CLOSING,
+        LIBFPTR_PARAM_AVAILABLE_CANCELLATION,
+        LIBFPTR_PARAM_AVAILABLE_POSITION_ADDING,
+        LIBFPTR_PARAM_AVAILABLE_PAYMENT,
+        LIBFPTR_PARAM_AVAILABLE_TOTAL,
+        LIBFPTR_PARAM_AVAILABLE_ATTRIBUTES_ADDING,
+        LIBFPTR_PARAM_OPERATOR_REGISTERED,
+        LIBFPTR_PARAM_DEVICE_PLATFORM_VERSION,
+        LIBFPTR_PARAM_GUID,
+        LIBFPTR_PARAM_PATTERN_REGISTERS,
+        LIBFPTR_PARAM_PATTERN_TAGS,
+        LIBFPTR_PARAM_PATTERN_SETTINGS,
+        LIBFPTR_PARAM_VENDING,
+        LIBFPTR_PARAM_CATERING,
+        LIBFPTR_PARAM_WHOLESALE,
+        LIBFPTR_PARAM_REGISTRATION_POSITION_FORM,
+        LIBFPTR_PARAM_MERGE_POSITIONS,
+        LIBFPTR_PARAM_DATAFLASH_JEDEC_ID,
+        LIBFPTR_PARAM_DATAFLASH_NAME,
+        LIBFPTR_PARAM_DATAFLASH_SIZE,
+        LIBFPTR_PARAM_FRAM_EEPROM_NAME,
+        LIBFPTR_PARAM_FRAM_EEPROM_SIZE,
+        LIBFPTR_PARAM_MARKING_NOT_FORM_REQUEST,
+        LIBFPTR_PARAM_PRINT_ENTITY_TYPE,
+        LIBFPTR_PARAM_RECEIPT_TAPE_PATH_LENGTH,
+        LIBFPTR_PARAM_LICENSE_INDEX,
+        LIBFPTR_PARAM_IS_LICENSE_VALID,
+        LIBFPTR_PARAM_RECEIPT_PERCENTAGE_SIZE,
+        LIBFPTR_PARAM_LAST_SUCCESS_FNM_UPDATE_KEYS_DATE_TIME,
+        LIBFPTR_PARAM_LAST_ATTEMPTION_FNM_UPDATE_KEYS_DATE_TIME,
+        LIBFPTR_PARAM_COUNT_ATTEMPTION_FNM_UPDATE_KEYS,
+    ) = RANGE(65536, 65939)
 
     (
         LIBFPTR_OK,
@@ -661,7 +699,16 @@ class IFptr(object):
         LIBFPTR_ERROR_OVERLAY_DATA_OVERFLOW,
         LIBFPTR_ERROR_INVALID_MODULE_ADDRESS,
         LIBFPTR_ERROR_ECR_MODEL_NOT_SUPPORTED,
-    ) = RANGE(0, 270)
+        LIBFPTR_ERROR_PAID_NOT_REQUIRED,
+        LIBFPTR_ERROR_NON_PRINTABLE_CHAR,
+        LIBFPTR_ERROR_INVALID_USER_TAG,
+        LIBFPTR_ERROR_COMMODITIES_TABLE_ITERATION_STOPPED,
+        LIBFPTR_ERROR_COMMODITIES_TABLE_INVALID_CSV_FORMAT,
+        LIBFPTR_ERROR_MINIPOS_NO_FILE_ON_USB_STORE,
+        LIBFPTR_ERROR_MINIPOS_NO_AGENT_FISCAL_PROPERTY,
+        LIBFPTR_ERROR_NO_CONNECTION_WITH_PRINT_SERVICE,
+        LIBFPTR_ERROR_UNIVERSAL_COUNTERS_ARE_DISABLED,
+    ) = RANGE(0, 279)
 
     (
         LIBFPTR_ERROR_BASE_MARKING,
@@ -853,8 +900,12 @@ class IFptr(object):
         LIBFPTR_TAX_NO,
         LIBFPTR_TAX_VAT20,
         LIBFPTR_TAX_VAT120,
+        LIBFPTR_TAX_VAT5,
+        LIBFPTR_TAX_VAT7,
+        LIBFPTR_TAX_VAT105,
+        LIBFPTR_TAX_VAT107,
         LIBFPTR_TAX_INVALID,
-    ) = RANGE(0, 10)
+    ) = RANGE(0, 14)
 
     (
         LIBFPTR_EXTERNAL_DEVICE_DISPLAY,
@@ -917,7 +968,12 @@ class IFptr(object):
         LIBFPTR_DT_MCU_INFO,
         LIBFPTR_DT_MODULE_ADDRESS,
         LIBFPTR_DT_CACHE_REQUISITES,
-    ) = RANGE(0, 53)
+        LIBFPTR_DT_DEPARTMENT_SUM,
+        LIBFPTR_DT_MCU_TEMPERATURE,
+        LIBFPTR_DT_AVAILABLE_OPERATIONS,
+        LIBFPTR_DT_PATTERN_PARAMETERS,
+        LIBFPTR_DT_RECEIPT_TAPE_PATH_LENGTH,
+    ) = RANGE(0, 58)
 
     (
         LIBFPTR_FNDT_TAG_VALUE,
@@ -943,7 +999,10 @@ class IFptr(object):
         LIBFPTR_FNDT_ISM_EXCHANGE_STATUS,
         LIBFPTR_FNDT_MARKING_MODE_STATUS,
         LIBFPTR_FNDT_CHECK_MARK_TIME,
-    ) = RANGE(0, 23)
+        LIBFPTR_FNDT_RECEIPT_SIZE,
+        LIBFPTR_FNDT_NOTIFICATION_STATUS,
+        LIBFPTR_FNDT_FNM_KEYS_UPDATE_DATE_TIME,
+    ) = RANGE(0, 26)
 
     (
         LIBFPTR_UT_FIRMWARE,
@@ -1145,7 +1204,8 @@ class IFptr(object):
         LIBFPTR_MCT_WAIT_FOR_RESULT,
         LIBFPTR_MCT_RESULT_NOT_WAIT,
         LIBFPTR_MCT_QUERY_NOT_SEND,
-    ) = RANGE(0, 4)
+        LIBFPTR_MCT_QUERY_NOT_FORM,
+    ) = RANGE(0, 5)
 
     (
         LIBFPTR_MCST_WAITING_FOR_TASK,
@@ -1157,6 +1217,52 @@ class IFptr(object):
         LIBFPTR_MCST_TASK_IS_OVER,
         LIBFPTR_MCST_WAITING_FOR_REPEAT,
     ) = RANGE(0, 8)
+
+    (
+        LIBFPTR_SILENT_REBOOT_NO,
+        LIBFPTR_SILENT_REBOOT_AFTER_SESSION_CLOSE,
+        LIBFPTR_SILENT_REBOOT_BEFORE_SESSION_OPEN,
+    ) = RANGE(0, 3)
+
+    (
+        LIBFPTR_MERGE_RECEIPT_NO,
+        LIBFPTR_MERGE_RECEIPT_ALL,
+        LIBFPTR_MERGE_RECEIPT_MARK_ONLY,
+    ) = RANGE(0, 3)
+
+    (
+        LIBFPTR_RPF_ELECTRONIC_AND_PRINT,
+        LIBFPTR_RPF_ONLY_ELECTRONIC,
+        LIBFPTR_RPF_ONLY_PRINT,
+    ) = RANGE(0, 3)
+
+    (
+        LIBFPTR_PET_STRINGS,
+        LIBFPTR_PET_PICTURES,
+        LIBFPTR_PET_FISCAL_DOCUMENT,
+    ) = RANGE(0, 3)
+
+    (
+        LIBFPTR_LIC_BASE_FISCAL,
+        LIBFPTR_LIC_WRITE_FW,
+        LIBFPTR_LIC_TAX_20,
+        LIBFPTR_LIC_FFD_1_1,
+        LIBFPTR_LIC_MARK_CODE,
+        LIBFPTR_LIC_EXT_FUNC,
+        LIBFPTR_LIC_TEMPLATE,
+        LIBFPTR_LIC_PRINT_BMP,
+        LIBFPTR_LIC_DISABLE_PF,
+        LIBFPTR_LIC_FFD_1_2,
+        LIBFPTR_LIC_FR_WORK,
+        LIBFPTR_LIC_WEB,
+        LIBFPTR_LIC_FFD_1_1_2,
+        LIBFPTR_LIC_TEST_LAB,
+        LIBFPTR_LIC_WEB_REQ,
+        LIBFPTR_LIC_RELESE,
+        LIBFPTR_LIC_EXT_PRINT,
+        LIBFPTR_LIC_OSU,
+        LIBFPTR_LIC_EXT_FISCAL,
+    ) = RANGE(0, 19)
 
     (
         LIBFPTR_ERROR_BASE_RPC,
@@ -1225,6 +1331,16 @@ class IFptr(object):
 
     LIBFPTR_SETTING_AUTO_MEASUREMENT_UNIT = "AutoMeasurementUnit"
 
+    LIBFPTR_SETTING_SILENT_REBOOT = "SilentReboot"
+
+    LIBFPTR_SETTING_LOG_PATHS = "LogPaths"
+
+    LIBFPTR_SETTING_AUTO_TIME_SYNC = "AutoTimeSync"
+
+    LIBFPTR_SETTING_AUTO_TIME_SYNC_TIME = "AutoTimeSyncTime"
+
+    LIBFPTR_SETTING_MERGE_RECEIPT_ITEMS = "MergeReceiptItems"
+
     LIBFPTR_MODEL_UNKNOWN = 0
 
     LIBFPTR_MODEL_ATOL_25F = 57
@@ -1276,6 +1392,18 @@ class IFptr(object):
     LIBFPTR_MODEL_ATOL_47FA = 48
 
     LIBFPTR_MODEL_ATOL_PT_5F = 89
+
+    LIBFPTR_MODEL_ATOL_27_FP7_F = 99
+
+    LIBFPTR_MODEL_ATOL_42FA = 70
+
+    LIBFPTR_MODEL_ALLIANCE_20F = 50
+
+    LIBFPTR_MODEL_ATOL_55V2F = 66
+
+    LIBFPTR_MODEL_ATOL_STB_6F = 92
+
+    LIBFPTR_MODEL_ATOL_35F = 97
 
     LIBFPTR_PORT_BR_1200 = 1200
 
@@ -1489,6 +1617,12 @@ class IFptr(object):
 
     LIBFPTR_ERROR_USERS_SCRIPTS_BASE = 1000
 
+    LIBFPTR_PLATFORM_UNKNOWN = 0
+
+    LIBFPTR_PLATFORM_25 = 25
+
+    LIBFPTR_PLATFORM_50 = 50
+
     LIBFPTR_ERROR_USERS_SCRIPTS_END = 1999
 
     LIBFPTR_ERROR_RPC_END = 699
@@ -1514,6 +1648,10 @@ class IFptr(object):
                                                     ctypes.c_void_p,
                                                     ctypes.c_wchar_p,
                                                     ctypes.c_int)
+    GET_ERROR_RECOMMENDATION_METHOD = ctypes.CFUNCTYPE(ctypes.c_int,
+                                                       ctypes.c_void_p,
+                                                       ctypes.c_wchar_p,
+                                                       ctypes.c_int)
     RESET_ERROR_METHOD = ctypes.CFUNCTYPE(None,
                                           ctypes.c_void_p)
 
@@ -1592,6 +1730,9 @@ class IFptr(object):
                                            ctypes.POINTER(ctypes.c_int),
                                            ctypes.POINTER(ctypes.c_int),
                                            ctypes.POINTER(ctypes.c_int))
+    IS_PARAM_AVAILABLE_METHOD = ctypes.CFUNCTYPE(ctypes.c_int,
+                                                 ctypes.c_void_p,
+                                                 ctypes.c_int)
 
     LOG_WRITE_METHOD = ctypes.CFUNCTYPE(ctypes.c_int,
                                         ctypes.c_void_p,
@@ -1694,6 +1835,8 @@ class IFptr(object):
         self._setNonPrintableString = self.SET_STRING_METHOD(('libfptr_set_non_printable_param_str', self.library))
         self._getString = self.GET_STRING_METHOD(('libfptr_get_param_str', self.library))
 
+        self._isParamAvailable = self.IS_PARAM_AVAILABLE_METHOD(('libfptr_is_param_available', self.library))
+
         self._setSettings = self.SET_SETTINGS_METHOD(('libfptr_set_settings', self.library))
         self._getSettings = self.GET_SETTINGS_METHOD(('libfptr_get_settings', self.library))
 
@@ -1704,6 +1847,7 @@ class IFptr(object):
         self._isOpened = self.IS_OPENED_METHOD(('libfptr_is_opened', self.library))
         self._errorCode = self.GET_ERROR_CODE_METHOD(('libfptr_error_code', self.library))
         self._errorDescription = self.GET_ERROR_DESCRIPTION_METHOD(('libfptr_error_description', self.library))
+        self._errorRecommendation = self.GET_ERROR_RECOMMENDATION_METHOD(('libfptr_error_recommendation', self.library))
         self._resetError = self.RESET_ERROR_METHOD(('libfptr_reset_error', self.library))
         self._logWrite = self.LOG_WRITE_METHOD(('libfptr_log_write_ex', self.library))
         self._showProperties = self.SHOW_PROPERTIES_METHOD(('libfptr_show_properties', self.library))
@@ -1715,6 +1859,9 @@ class IFptr(object):
 
     def version(self):
         return self._getVersion()
+
+    def wrapperVersion(self):
+        return "10.10.6.0"
 
     def logWrite(self, tag, level, message):
         return self._logWrite(self.interface, tag, level, message)
@@ -1742,6 +1889,14 @@ class IFptr(object):
             self._errorDescription(self.interface, buff, size)
         return buff.value
 
+    def errorRecommendation(self):
+        buff = ctypes.create_unicode_buffer(self.DEFAULT_BUFF_SIZE)
+        size = self._errorRecommendation(self.interface, buff, self.DEFAULT_BUFF_SIZE)
+        if size > self.DEFAULT_BUFF_SIZE:
+            buff = ctypes.create_unicode_buffer(size)
+            self._errorRecommendation(self.interface, buff, size)
+        return buff.value
+
     def setSettings(self, settings):
         if isinstance(settings, dict):
             settings = json.dumps(settings)
@@ -1759,6 +1914,10 @@ class IFptr(object):
         return buff.value
 
     def setSingleSetting(self, key, value):
+        if isinstance(value, bool):
+            value = '1' if value else '0'
+        elif isinstance(value, int):
+            value = str(value)
         self._setSingleSetting(self.interface, key, value)
 
     def getSingleSetting(self, key):
@@ -1879,6 +2038,10 @@ class IFptr(object):
             value = ctypes.create_unicode_buffer(size)
             self._getString(self.interface, ctypes.c_int(paramId), value, size)
         return value.value
+
+    def isParamAvailable(self, paramId):
+        value = self._isParamAvailable(self.interface, ctypes.c_int(paramId))
+        return value > 0
 
     def applySingleSettings(self):
         _method = self.METHOD(('libfptr_apply_single_settings', self.library))
@@ -2354,4 +2517,12 @@ class IFptr(object):
 
     def getLastDocumentJournal(self):
         _method = self.METHOD(('libfptr_get_last_document_journal', self.library))
+        return _method(self.interface)
+
+    def findDocumentInJournal(self):
+        _method = self.METHOD(('libfptr_find_document_in_journal', self.library))
+        return _method(self.interface)
+
+    def runFnCommand(self):
+        _method = self.METHOD(('libfptr_run_fn_command', self.library))
         return _method(self.interface)
